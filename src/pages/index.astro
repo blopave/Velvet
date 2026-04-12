@@ -1,0 +1,397 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const services = [
+  { number: '01', name: { es: 'Film', en: 'Film' } },
+  { number: '02', name: { es: 'Fotografía', en: 'Photography' } },
+  { number: '03', name: { es: 'Contenido Digital', en: 'Digital Content' } },
+  { number: '04', name: { es: 'Activaciones', en: 'Activations' } },
+  { number: '05', name: { es: 'Dirección Creativa', en: 'Creative Direction' } },
+  { number: '06', name: { es: 'Post Producción', en: 'Post Production' } },
+];
+
+const projects = [
+  {
+    title: 'Romper la Pared',
+    category: 'Film',
+    client: 'Netflix',
+    year: '2025',
+    image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&q=80',
+  },
+  {
+    title: 'Betano Campaign',
+    category: 'Film',
+    client: 'Betano',
+    year: '2025',
+    image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
+  },
+  {
+    title: 'House of the Dragon',
+    category: 'Film',
+    client: 'HBO Max',
+    year: '2024',
+    image: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&q=80',
+  },
+  {
+    title: 'See The Game',
+    category: { es: 'Contenido Digital', en: 'Digital Content' },
+    client: 'Puma',
+    year: '2024',
+    image: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=800&q=80',
+  },
+  {
+    title: 'Visa Cashback',
+    category: 'Film',
+    client: 'Visa',
+    year: '2024',
+    image: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&q=80',
+  },
+  {
+    title: 'Run Wild',
+    category: { es: 'Activaciones', en: 'Activations' },
+    client: 'Under Armour',
+    year: '2024',
+    image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=80',
+  },
+];
+
+const clients = [
+  'Netflix', 'HBO Max', 'Puma', 'Visa',
+  'Under Armour', 'EA Sports', 'Corona', 'Danone',
+  'Star+', 'Betano', 'DirecTV', 'Vista Energy',
+];
+
+---
+
+<Layout>
+  <!-- Navigation -->
+  <nav class="nav" style="opacity: 0;">
+    <a href="/" class="nav-logo">Velvet</a>
+
+    <ul class="nav-center">
+      <li><a href="#work">Film</a></li>
+      <li><a href="#work">Photo</a></li>
+      <li><a href="#work">Digital</a></li>
+      <li><a href="#work">Activations</a></li>
+      <li>
+        <a href="#about">
+          <span data-lang-es>Nosotros</span>
+          <span data-lang-en>About</span>
+        </a>
+      </li>
+      <li>
+        <a href="#contact">
+          <span data-lang-es>Contacto</span>
+          <span data-lang-en>Contact</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="nav-right">
+      <div class="lang-switch">
+        <button class="lang-btn is-active" data-lang="es">ES</button>
+        <span class="divider">/</span>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <button class="nav-menu-btn" aria-label="Menu">
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu">
+    <a href="#work">Film</a>
+    <a href="#work">Photo</a>
+    <a href="#work">Digital</a>
+    <a href="#work">Activations</a>
+    <a href="#about">
+      <span data-lang-es>Nosotros</span>
+      <span data-lang-en>About</span>
+    </a>
+    <a href="#contact">
+      <span data-lang-es>Contacto</span>
+      <span data-lang-en>Contact</span>
+    </a>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-video-container">
+      <div class="hero-video-overlay"></div>
+    </div>
+
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <span class="line"><span class="line-inner">Velvet</span></span>
+        <span class="line"><span class="line-inner hero-title-sub">Creative Company</span></span>
+      </h1>
+      <p class="hero-subtitle">
+        <span data-lang-es>Film &mdash; Foto &mdash; Contenido Digital &mdash; Activaciones</span>
+        <span data-lang-en>Film &mdash; Photo &mdash; Digital Content &mdash; Activations</span>
+      </p>
+    </div>
+
+    <div class="hero-scroll-indicator">
+      <span>Scroll</span>
+      <div class="hero-scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- Showreel -->
+  <section class="reel-section">
+    <div class="reel-container reveal-up" style="background: var(--color-velvet-gray);">
+      <img
+        src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1200&q=80"
+        alt="Velvet Showreel"
+        style="opacity:0.6;"
+      />
+      <div class="reel-play-btn" id="reelPlayBtn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="5,3 19,12 5,21" />
+        </svg>
+        <span>Reel</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>Film</span>
+      <span class="filled">&bull;</span>
+      <span>Foto</span>
+      <span class="filled">&bull;</span>
+      <span>Digital</span>
+      <span class="filled">&bull;</span>
+      <span>Activaciones</span>
+      <span class="filled">&bull;</span>
+      <span>Film</span>
+      <span class="filled">&bull;</span>
+      <span>Foto</span>
+      <span class="filled">&bull;</span>
+      <span>Digital</span>
+      <span class="filled">&bull;</span>
+      <span>Activaciones</span>
+      <span class="filled">&bull;</span>
+    </div>
+  </div>
+
+  <!-- Selected Work -->
+  <section id="work" class="section">
+    <div class="section-label reveal-up">
+      <span data-lang-es>Trabajo Seleccionado</span>
+      <span data-lang-en>Selected Work</span>
+    </div>
+
+    <div class="work-grid">
+      {projects.map((project) => (
+        <article class="work-item">
+          <div class="work-item-media">
+            <img
+              src={project.image}
+              alt={`${project.client} — ${project.title}`}
+              loading="lazy"
+            />
+          </div>
+          <div class="work-item-overlay"></div>
+          <div class="work-item-info">
+            <div class="work-item-category">
+              {typeof project.category === 'string' ? project.category : (
+                <>
+                  <span data-lang-es>{project.category.es}</span>
+                  <span data-lang-en>{project.category.en}</span>
+                </>
+              )} — {project.client}
+            </div>
+            <h3 class="work-item-title">{project.title}</h3>
+            <span class="work-item-year">{project.year}</span>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div style="text-align: center; margin-top: clamp(3rem, 6vw, 5rem);">
+      <a href="/work" class="magnetic-btn reveal-up">
+        <span data-lang-es>Ver Todos los Proyectos</span>
+        <span data-lang-en>View All Projects</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- Manifesto -->
+  <section id="about" class="section">
+    <div class="section-label reveal-up">
+      <span data-lang-es>Manifiesto</span>
+      <span data-lang-en>Manifesto</span>
+    </div>
+
+    <p class="manifesto-text" data-lang-es>
+      {("No solo creamos contenido. Creamos historias que viven en el corazón y la mente de millones. Cada cuadro, cada pixel, cada momento está diseñado para mover al mundo hacia adelante.").split(' ').map((word) => (
+        <span class="word">{word}&nbsp;</span>
+      ))}
+    </p>
+    <p class="manifesto-text" data-lang-en>
+      {("We don't just create content. We craft stories that live in the hearts and minds of millions. Every frame, every pixel, every moment is designed to move people forward.").split(' ').map((word) => (
+        <span class="word">{word}&nbsp;</span>
+      ))}
+    </p>
+  </section>
+
+  <!-- Ethos / Philosophy -->
+  <section class="ethos-section">
+    <div class="ethos-grid">
+      <div>
+        <div class="section-label reveal-up">
+          <span data-lang-es>Filosofía</span>
+          <span data-lang-en>Philosophy</span>
+        </div>
+        <h2 class="ethos-title">
+          <span data-lang-es>
+            Lo ordinario<br />
+            no nos<br />
+            <span class="italic">interesa.</span>
+          </span>
+          <span data-lang-en>
+            The ordinary<br />
+            doesn't<br />
+            <span class="italic">interest us.</span>
+          </span>
+        </h2>
+      </div>
+      <div class="ethos-body">
+        <p data-lang-es>
+          En Velvet, cada proyecto es una oportunidad para desafiar lo establecido. Trabajamos con marcas que entienden que la creatividad no es un lujo — es una necesidad estratégica.
+        </p>
+        <p data-lang-en>
+          At Velvet, every project is an opportunity to challenge the status quo. We work with brands that understand creativity is not a luxury — it's a strategic necessity.
+        </p>
+        <p data-lang-es>
+          Desde Buenos Aires para el mundo, combinamos la pasión latinoamericana con estándares globales de producción. El resultado: trabajo que no solo se ve bien, sino que genera impacto real.
+        </p>
+        <p data-lang-en>
+          From Buenos Aires to the world, we combine Latin American passion with global production standards. The result: work that doesn't just look good, but creates real impact.
+        </p>
+      </div>
+    </div>
+    <div class="ethos-large-text">Velvet</div>
+  </section>
+
+  <!-- Services -->
+  <section id="services" class="section">
+    <div class="section-label reveal-up">
+      <span data-lang-es>Lo Que Hacemos</span>
+      <span data-lang-en>What We Do</span>
+    </div>
+
+    <div>
+      {services.map((service) => (
+        <div class="service-item">
+          <span class="service-number">{service.number}</span>
+          <span class="service-name">
+            <span data-lang-es>{service.name.es}</span>
+            <span data-lang-en>{service.name.en}</span>
+          </span>
+          <span class="service-arrow">&rarr;</span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Clients -->
+  <section class="section">
+    <div class="section-label reveal-up">
+      <span data-lang-es>Confían en Nosotros</span>
+      <span data-lang-en>Trusted By</span>
+    </div>
+
+    <div class="clients-grid">
+      {clients.map((client) => (
+        <div class="client-item">
+          <span>{client}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="cta-section">
+    <h2 class="cta-title">
+      <span data-lang-es>
+        Creemos algo<br />
+        <span class="accent">extraordinario</span>
+      </span>
+      <span data-lang-en>
+        Let's create<br />
+        something <span class="accent">extraordinary</span>
+      </span>
+    </h2>
+    <a href="mailto:juan.rojas@velvetcc.com" class="magnetic-btn">
+      <span data-lang-es>Iniciar un Proyecto</span>
+      <span data-lang-en>Start a Project</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">Velvet</div>
+        <p class="footer-tagline">
+          <span data-lang-es>Estudio creativo premium en Buenos Aires. Historias visuales para las marcas más ambiciosas del mundo.</span>
+          <span data-lang-en>Premium creative studio in Buenos Aires. Visual stories for the world's most ambitious brands.</span>
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-col-title">
+          <span data-lang-es>Navegación</span>
+          <span data-lang-en>Navigation</span>
+        </div>
+        <a href="#work">
+          <span data-lang-es>Trabajo</span>
+          <span data-lang-en>Work</span>
+        </a>
+        <a href="#services">
+          <span data-lang-es>Servicios</span>
+          <span data-lang-en>Services</span>
+        </a>
+        <a href="#about">
+          <span data-lang-es>Nosotros</span>
+          <span data-lang-en>About</span>
+        </a>
+        <a href="#contact">
+          <span data-lang-es>Contacto</span>
+          <span data-lang-en>Contact</span>
+        </a>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-col-title">Social</div>
+        <a href="https://www.instagram.com/velvet.creative" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.linkedin.com/company/velvetcc" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.youtube.com/@VelvetC.C" target="_blank" rel="noopener">YouTube</a>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-col-title">
+          <span data-lang-es>Contacto</span>
+          <span data-lang-en>Contact</span>
+        </div>
+        <a href="mailto:juan.rojas@velvetcc.com">juan.rojas@velvetcc.com</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>&copy; 2026 Velvet — Creative Company.</span>
+      <span>Buenos Aires, Argentina</span>
+    </div>
+  </footer>
+</Layout>
