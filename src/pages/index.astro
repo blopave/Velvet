@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { projects, clients, getProjectImage } from '../data/projects';
 
 const services = [
   { number: '01', name: { es: 'Film', en: 'Film' } },
@@ -9,58 +10,6 @@ const services = [
   { number: '05', name: { es: 'Dirección Creativa', en: 'Creative Direction' } },
   { number: '06', name: { es: 'Post Producción', en: 'Post Production' } },
 ];
-
-const projects = [
-  {
-    title: 'Romper la Pared',
-    category: 'Film',
-    client: 'Netflix',
-    year: '2025',
-    image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&q=80',
-  },
-  {
-    title: 'Betano Campaign',
-    category: 'Film',
-    client: 'Betano',
-    year: '2025',
-    image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
-  },
-  {
-    title: 'House of the Dragon',
-    category: 'Film',
-    client: 'HBO Max',
-    year: '2024',
-    image: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&q=80',
-  },
-  {
-    title: 'See The Game',
-    category: { es: 'Contenido Digital', en: 'Digital Content' },
-    client: 'Puma',
-    year: '2024',
-    image: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=800&q=80',
-  },
-  {
-    title: 'Visa Cashback',
-    category: 'Film',
-    client: 'Visa',
-    year: '2024',
-    image: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&q=80',
-  },
-  {
-    title: 'Run Wild',
-    category: { es: 'Activaciones', en: 'Activations' },
-    client: 'Under Armour',
-    year: '2024',
-    image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=80',
-  },
-];
-
-const clients = [
-  'Netflix', 'HBO Max', 'Puma', 'Visa',
-  'Under Armour', 'EA Sports', 'Corona', 'Danone',
-  'Star+', 'Betano', 'DirecTV', 'Vista Energy',
-];
-
 ---
 
 <Layout>
@@ -69,10 +18,18 @@ const clients = [
     <a href="/" class="nav-logo">Velvet</a>
 
     <ul class="nav-center">
-      <li><a href="#work">Film</a></li>
-      <li><a href="#work">Photo</a></li>
-      <li><a href="#work">Digital</a></li>
-      <li><a href="#work">Activations</a></li>
+      <li>
+        <a href="#work">
+          <span data-lang-es>Trabajo</span>
+          <span data-lang-en>Work</span>
+        </a>
+      </li>
+      <li>
+        <a href="#services">
+          <span data-lang-es>Servicios</span>
+          <span data-lang-en>Services</span>
+        </a>
+      </li>
       <li>
         <a href="#about">
           <span data-lang-es>Nosotros</span>
@@ -102,10 +59,14 @@ const clients = [
 
   <!-- Mobile Menu -->
   <div class="mobile-menu">
-    <a href="#work">Film</a>
-    <a href="#work">Photo</a>
-    <a href="#work">Digital</a>
-    <a href="#work">Activations</a>
+    <a href="#work">
+      <span data-lang-es>Trabajo</span>
+      <span data-lang-en>Work</span>
+    </a>
+    <a href="#services">
+      <span data-lang-es>Servicios</span>
+      <span data-lang-en>Services</span>
+    </a>
     <a href="#about">
       <span data-lang-es>Nosotros</span>
       <span data-lang-en>About</span>
@@ -139,87 +100,121 @@ const clients = [
     </div>
   </section>
 
-  <!-- Showreel -->
-  <section class="reel-section">
-    <div class="reel-container reveal-up" style="background: var(--color-velvet-gray);">
-      <img
-        src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1200&q=80"
-        alt="Velvet Showreel"
-        style="opacity:0.6;"
-      />
-      <div class="reel-play-btn" id="reelPlayBtn">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="5,3 19,12 5,21" />
-        </svg>
-        <span>Reel</span>
-      </div>
-    </div>
-  </section>
-
   <!-- Marquee -->
   <div class="marquee">
     <div class="marquee-track">
-      <span>Film</span>
+      <span>Netflix</span>
       <span class="filled">&bull;</span>
-      <span>Foto</span>
+      <span class="stroke-accent">Puma</span>
       <span class="filled">&bull;</span>
-      <span>Digital</span>
+      <span>HBO Max</span>
       <span class="filled">&bull;</span>
-      <span>Activaciones</span>
+      <span class="stroke-accent">Visa</span>
       <span class="filled">&bull;</span>
-      <span>Film</span>
+      <span>Under Armour</span>
       <span class="filled">&bull;</span>
-      <span>Foto</span>
+      <span class="stroke-accent">Corona</span>
       <span class="filled">&bull;</span>
-      <span>Digital</span>
+      <span>EA Sports</span>
       <span class="filled">&bull;</span>
-      <span>Activaciones</span>
+      <span class="stroke-accent">Betano</span>
+      <span class="filled">&bull;</span>
+      <span>Netflix</span>
+      <span class="filled">&bull;</span>
+      <span class="stroke-accent">Puma</span>
+      <span class="filled">&bull;</span>
+      <span>HBO Max</span>
+      <span class="filled">&bull;</span>
+      <span class="stroke-accent">Visa</span>
+      <span class="filled">&bull;</span>
+      <span>Under Armour</span>
+      <span class="filled">&bull;</span>
+      <span class="stroke-accent">Corona</span>
+      <span class="filled">&bull;</span>
+      <span>EA Sports</span>
+      <span class="filled">&bull;</span>
+      <span class="stroke-accent">Betano</span>
       <span class="filled">&bull;</span>
     </div>
   </div>
 
   <!-- Selected Work -->
   <section id="work" class="section">
-    <div class="section-label reveal-up">
-      <span data-lang-es>Trabajo Seleccionado</span>
-      <span data-lang-en>Selected Work</span>
+    <div class="section-header">
+      <div class="section-label reveal-up">
+        <span data-lang-es>Trabajo Seleccionado</span>
+        <span data-lang-en>Selected Work</span>
+      </div>
+
+      <div class="work-filters reveal-up">
+        <button class="filter-btn is-active" data-filter="all">
+          <span data-lang-es>Todos</span>
+          <span data-lang-en>All</span>
+        </button>
+        <button class="filter-btn" data-filter="Film">Film</button>
+        <button class="filter-btn" data-filter="Digital Content">
+          <span data-lang-es>Digital</span>
+          <span data-lang-en>Digital</span>
+        </button>
+        <button class="filter-btn" data-filter="Activations">
+          <span data-lang-es>Activaciones</span>
+          <span data-lang-en>Activations</span>
+        </button>
+      </div>
     </div>
 
     <div class="work-grid">
       {projects.map((project) => (
-        <article class="work-item">
+        <a href={`/project/${project.slug}`} class="work-item" data-category={project.category}>
           <div class="work-item-media">
             <img
-              src={project.image}
+              src={getProjectImage(project)}
               alt={`${project.client} — ${project.title}`}
               loading="lazy"
             />
-          </div>
-          <div class="work-item-overlay"></div>
-          <div class="work-item-info">
-            <div class="work-item-category">
-              {typeof project.category === 'string' ? project.category : (
-                <>
-                  <span data-lang-es>{project.category.es}</span>
-                  <span data-lang-en>{project.category.en}</span>
-                </>
-              )} — {project.client}
+            <div class="work-item-overlay">
+              <div class="work-item-overlay-info">
+                <div class="work-item-overlay-category">{project.category} — {project.client}</div>
+                <h3 class="work-item-overlay-title">{project.title}</h3>
+              </div>
             </div>
-            <h3 class="work-item-title">{project.title}</h3>
-            <span class="work-item-year">{project.year}</span>
           </div>
-        </article>
+          <div class="work-item-info">
+            <span class="work-item-title">{project.client} — {project.title}</span>
+            <div class="work-item-meta">
+              <span class="work-item-category">{project.category}</span>
+              <span class="work-item-year">{project.year}</span>
+            </div>
+          </div>
+        </a>
       ))}
     </div>
+  </section>
 
-    <div style="text-align: center; margin-top: clamp(3rem, 6vw, 5rem);">
-      <a href="/work" class="magnetic-btn reveal-up">
-        <span data-lang-es>Ver Todos los Proyectos</span>
-        <span data-lang-en>View All Projects</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-      </a>
+  <!-- Impact Counter -->
+  <section class="counter-section">
+    <div class="counter-grid">
+      <div class="counter-item">
+        <span class="counter-number" data-count="23">0</span>
+        <span class="counter-label">
+          <span data-lang-es>Producciones</span>
+          <span data-lang-en>Productions</span>
+        </span>
+      </div>
+      <div class="counter-item">
+        <span class="counter-number" data-count="12">0</span>
+        <span class="counter-label">
+          <span data-lang-es>Marcas Globales</span>
+          <span data-lang-en>Global Brands</span>
+        </span>
+      </div>
+      <div class="counter-item">
+        <span class="counter-number" data-count="4">0</span>
+        <span class="counter-label">
+          <span data-lang-es>Disciplinas</span>
+          <span data-lang-en>Disciplines</span>
+        </span>
+      </div>
     </div>
   </section>
 
@@ -312,7 +307,16 @@ const clients = [
     <div class="clients-grid">
       {clients.map((client) => (
         <div class="client-item">
-          <span>{client}</span>
+          {client.logo ? (
+            <img
+              src={`https://cdn.simpleicons.org/${client.logo}/666666`}
+              alt={client.name}
+              class="client-logo"
+              loading="lazy"
+            />
+          ) : (
+            <span class="client-text">{client.name}</span>
+          )}
         </div>
       ))}
     </div>
@@ -322,12 +326,10 @@ const clients = [
   <section id="contact" class="cta-section">
     <h2 class="cta-title">
       <span data-lang-es>
-        Creemos algo<br />
-        <span class="accent">extraordinario</span>
+        Creemos algo <span class="accent">extraordinario</span>
       </span>
       <span data-lang-en>
-        Let's create<br />
-        something <span class="accent">extraordinary</span>
+        Let's create something <span class="accent">extraordinary</span>
       </span>
     </h2>
     <a href="mailto:juan.rojas@velvetcc.com" class="magnetic-btn">
