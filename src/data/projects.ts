@@ -1,3 +1,14 @@
+export interface Credit {
+  role: string;
+  name: string;
+}
+
+export interface CaseStudy {
+  brief: { es: string; en: string };
+  approach: { es: string; en: string };
+  outcome?: { es: string; en: string };
+}
+
 export interface Project {
   slug: string;
   title: string;
@@ -6,7 +17,17 @@ export interface Project {
   year: string;
   videoId?: string;
   thumbnail?: string;
+  previewVideo?: string; // path or URL to a muted 5-10s loop for hover preview
   featured?: boolean;
+  director?: string;
+  agency?: string;
+  synopsis?: {
+    es: string;
+    en: string;
+  };
+  credits?: Credit[];
+  stills?: string[]; // paths under /public/images/projects/{slug}/
+  caseStudy?: CaseStudy;
 }
 
 export const projects: Project[] = [
@@ -18,6 +39,7 @@ export const projects: Project[] = [
     year: '2025',
     videoId: 'M3Ooc78bmD4',
     featured: true,
+    director: 'Por confirmar',
   },
   {
     slug: 'netflix-di-maria-romper-la-pared',
@@ -27,6 +49,39 @@ export const projects: Project[] = [
     year: '2025',
     videoId: '9VSQHKazRTA',
     featured: true,
+    // PLACEHOLDER — confirmar con Juan antes de publicar
+    synopsis: {
+      es: 'Un retrato íntimo del regreso de Ángel Di María a Rosario Central. La pieza se mueve entre material de archivo y escenas presentes, recorriendo los años fuera de casa y la promesa silenciosa que se hizo a sí mismo: volver antes de colgar los botines.',
+      en: 'An intimate portrait of Ángel Di María\'s return to Rosario Central. The piece moves between archive footage and present-day scenes, tracing the years away from home and the quiet promise he made to himself — to come back before hanging up the boots.',
+    },
+    director: 'Por confirmar',
+    agency: 'Por confirmar',
+    credits: [
+      { role: 'Direction', name: 'Por confirmar' },
+      { role: 'Director of Photography', name: 'Por confirmar' },
+      { role: 'Executive Producer', name: 'Por confirmar' },
+      { role: 'Editor', name: 'Por confirmar' },
+      { role: 'Color', name: 'Por confirmar' },
+      { role: 'Sound Design', name: 'Por confirmar' },
+      { role: 'Music', name: 'Por confirmar' },
+      { role: 'Production Co.', name: 'Velvet Creative Company' },
+      { role: 'Client', name: 'Netflix' },
+    ],
+    // PLACEHOLDER — confirmar con Juan / Netflix antes de publicar
+    caseStudy: {
+      brief: {
+        es: 'Netflix quería contar el regreso de Ángel Di María a Rosario Central sin caer en el documental deportivo clásico. La pieza tenía que funcionar como tráiler de algo más grande — el inicio de una historia, no su resumen.',
+        en: 'Netflix wanted to tell the story of Ángel Di María\'s return to Rosario Central without falling into the classic sports documentary. The piece needed to work as a trailer for something larger — the beginning of a story, not its summary.',
+      },
+      approach: {
+        es: 'Tejimos material de archivo familiar con escenas presentes filmadas en Rosario y el predio de la AFA. El corte alterna promesas viejas con el regreso, sin narrador. La voz quedó para él.',
+        en: 'We wove family archive footage with present-day scenes shot in Rosario and at the AFA training ground. The edit alternates old promises with the return, without a narrator. The voice was left to him.',
+      },
+      outcome: {
+        es: 'La pieza generó conversación en medios locales y abrió camino al documental extendido. Detalles de métricas — por confirmar con Netflix.',
+        en: 'The piece sparked conversation in local media and paved the way for the extended documentary. Metrics — to be confirmed with Netflix.',
+      },
+    },
   },
   {
     slug: 'manifiesto-vista-energy-2025',
@@ -37,6 +92,7 @@ export const projects: Project[] = [
     videoId: '-aVef9zUj8k',
     thumbnail: 'sddefault',
     featured: true,
+    director: 'Por confirmar',
   },
   {
     slug: 'hbo-max-champions-league-2023',
@@ -46,6 +102,7 @@ export const projects: Project[] = [
     year: '2023',
     videoId: 'R9OWQt1w_MA',
     featured: true,
+    director: 'Por confirmar',
   },
   {
     slug: 'hbo-max-maria-marta',
@@ -55,6 +112,7 @@ export const projects: Project[] = [
     year: '2024',
     videoId: 'nuuevLIgy40',
     featured: true,
+    director: 'Por confirmar',
   },
   {
     slug: 'visa-open-2024',
@@ -64,6 +122,7 @@ export const projects: Project[] = [
     year: '2024',
     videoId: 'ZvUigJrUEF0',
     featured: true,
+    director: 'Por confirmar',
   },
   {
     slug: 'puma-cai-3rd-kit-2025',
@@ -73,6 +132,7 @@ export const projects: Project[] = [
     year: '2025',
     videoId: 'sbGUav_uHio',
     featured: true,
+    director: 'Por confirmar',
   },
   {
     slug: 'corona-mundial-qatar-2022',
@@ -82,6 +142,7 @@ export const projects: Project[] = [
     year: '2022',
     videoId: 'e1PtZXr0fYs',
     featured: true,
+    director: 'Por confirmar',
   },
   {
     slug: 'puma-cai-2024-home-kit',

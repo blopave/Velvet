@@ -1,0 +1,165 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="404 — Velvet"
+  description="La pieza que buscás no está acá. Volvé al cine."
+>
+  <nav class="nav nav-scrolled" style="opacity: 1;">
+    <a href="/" class="nav-logo">Velvet</a>
+    <div class="nav-right">
+      <div class="lang-switch">
+        <button class="lang-btn is-active" data-lang="es">ES</button>
+        <span class="divider">/</span>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <button class="nav-menu-trigger" id="navMenuTrigger" aria-label="Abrir menú" aria-expanded="false">
+        <span class="nav-menu-trigger-label">
+          <span class="nav-menu-trigger-text" data-state="closed">Menu</span>
+          <span class="nav-menu-trigger-text" data-state="open">Close</span>
+        </span>
+        <span class="nav-menu-trigger-lines" aria-hidden="true">
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+    </div>
+  </nav>
+
+  <section class="notfound-section">
+    <span class="notfound-code">404 &mdash;&mdash;</span>
+
+    <h1 class="notfound-statement">
+      <span data-lang-es>
+        Esta pieza<br />
+        <span class="notfound-statement-italic">no existe.</span>
+      </span>
+      <span data-lang-en>
+        This piece<br />
+        <span class="notfound-statement-italic">doesn&rsquo;t exist.</span>
+      </span>
+    </h1>
+
+    <a href="/" class="notfound-back" data-cursor="view">
+      <span class="notfound-back-arrow" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </span>
+      <span data-lang-es>Volver al cine</span>
+      <span data-lang-en>Back to the cinema</span>
+    </a>
+
+    <div class="notfound-signature">
+      <span>Velvet</span>
+      <span class="notfound-signature-sep">&middot;</span>
+      <span>Buenos Aires</span>
+    </div>
+  </section>
+</Layout>
+
+<style is:global>
+  .notfound-section {
+    min-height: calc(100vh - 6rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: clamp(5rem, 10vw, 10rem) clamp(1.5rem, 5vw, 6rem);
+    gap: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .notfound-code {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-velvet-muted);
+  }
+
+  .notfound-statement {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 8vw, 7rem);
+    font-weight: 500;
+    text-transform: uppercase;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--color-velvet-white);
+    font-optical-sizing: auto;
+    font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
+  }
+
+  .notfound-statement-italic {
+    font-style: italic;
+    font-weight: 400;
+    text-transform: none;
+    color: var(--color-velvet-accent);
+    letter-spacing: -0.025em;
+  }
+
+  .notfound-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.1rem, 2.2vw, 1.625rem);
+    font-weight: 400;
+    color: var(--color-velvet-light);
+    text-decoration: none;
+    cursor: none;
+    position: relative;
+    transition: color 0.4s ease, gap 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .notfound-back::after {
+    content: '';
+    position: absolute;
+    left: 2em;
+    right: 0;
+    bottom: -0.15em;
+    height: 1px;
+    background: var(--color-velvet-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .notfound-back:hover {
+    color: var(--color-velvet-white);
+    gap: 1.25rem;
+  }
+
+  .notfound-back:hover::after {
+    transform: scaleX(1);
+  }
+
+  .notfound-back-arrow {
+    display: inline-flex;
+    color: var(--color-velvet-light);
+  }
+
+  .notfound-back-arrow svg {
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  .notfound-signature {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.875rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-velvet-muted);
+    margin-top: 1rem;
+  }
+
+  .notfound-signature-sep {
+    opacity: 0.45;
+    letter-spacing: 0;
+  }
+</style>

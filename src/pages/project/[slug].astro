@@ -1,6 +1,8 @@
 ---
+import { Picture } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
-import { projects, getProjectBySlug } from '../../data/projects';
+import { projects, getProjectBySlug, getProjectImage } from '../../data/projects';
+import { getProjectPoster } from '../../utils/projectImages';
 
 export function getStaticPaths() {
   return projects.map(project => ({
@@ -14,108 +16,317 @@ const project = getProjectBySlug(slug)!;
 const projectIndex = projects.findIndex(p => p.slug === slug);
 const nextProject = projects[(projectIndex + 1) % projects.length];
 const prevProject = projects[(projectIndex - 1 + projects.length) % projects.length];
+
+const posterUrl = getProjectImage(project);
+const nextPoster = getProjectImage(nextProject);
+const prevPoster = getProjectImage(prevProject);
+
+// Per-project OG image — uses the YouTube thumbnail (publicly accessible) for shareability
+const projectOgImage = posterUrl || '/og-image.jpg';
+
+// Structured data — CreativeWork (Google understands this as a film/creative work)
+const projectJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': project.category === 'Film' ? 'Movie' : 'CreativeWork',
+  name: project.title,
+  alternateName: `${project.client} — ${project.title}`,
+  description: project.synopsis?.es ?? `${project.category} production for ${project.client} by Velvet Creative Company.`,
+  genre: project.category,
+  inLanguage: 'es-AR',
+  datePublished: project.year,
+  ...(project.director && project.director !== 'Por confirmar' && {
+    director: { '@type': 'Person', name: project.director },
+  }),
+  productionCompany: {
+    '@type': 'Organization',
+    name: 'Velvet',
+    url: 'https://velvetcc.com',
+  },
+  ...(project.client && {
+    sponsor: { '@type': 'Organization', name: project.client },
+  }),
+  ...(posterUrl && { thumbnailUrl: posterUrl, image: posterUrl }),
+  ...(project.videoId && {
+    contentUrl: `https://www.youtube.com/watch?v=${project.videoId}`,
+    embedUrl: `https://www.youtube.com/embed/${project.videoId}`,
+  }),
+};
 ---
 
-<Layout title={`${project.client} — ${project.title} | Velvet`} description={`${project.category} production for ${project.client} by Velvet Creative Company.`}>
-  <!-- Navigation -->
+<Layout
+  title={`${project.client} — ${project.title} | Velvet`}
+  description={project.synopsis?.es ?? `${project.category} production for ${project.client} by Velvet Creative Company.`}
+  ogImage={projectOgImage}
+  jsonLd={projectJsonLd}
+>
+  <!-- Navigation — minimal: logo + back-link + lang + menu trigger -->
   <nav class="nav nav-scrolled" style="opacity: 1;">
-    <a href="/" class="nav-logo">Velvet</a>
+    <div class="nav-left">
+      <a href="/" class="nav-logo">Velvet</a>
+      <a href="/#archive" class="nav-back-link">
+        <span class="nav-back-arrow" aria-hidden="true">&larr;</span>
+        <span data-lang-es>Trabajo</span>
+        <span data-lang-en>Work</span>
+      </a>
+    </div>
 
     <div class="nav-right">
-      <a href="/" class="back-link">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
-        </svg>
-        <span data-lang-es>Volver</span>
-        <span data-lang-en>Back</span>
-      </a>
       <div class="lang-switch">
         <button class="lang-btn is-active" data-lang="es">ES</button>
         <span class="divider">/</span>
         <button class="lang-btn" data-lang="en">EN</button>
       </div>
+      <button class="nav-menu-trigger" id="navMenuTrigger" aria-label="Abrir menú" aria-expanded="false">
+        <span class="nav-menu-trigger-label">
+          <span class="nav-menu-trigger-text" data-state="closed">Menu</span>
+          <span class="nav-menu-trigger-text" data-state="open">Close</span>
+        </span>
+        <span class="nav-menu-trigger-lines" aria-hidden="true">
+          <span></span>
+          <span></span>
+        </span>
+      </button>
     </div>
   </nav>
 
-  <!-- Project Hero -->
-  <section class="project-hero">
-    <div class="project-hero-content">
-      <div class="project-meta">
-        <span class="project-category">{project.category}</span>
-        <span class="project-year">{project.year}</span>
+  <!-- Project Hero (player + title block) -->
+  <section class="project-hero-v2">
+    <div class="project-hero-media" id="projectHeroMedia" data-video-id={project.videoId}>
+      {(() => {
+        const localPoster = getProjectPoster(project.slug);
+        if (localPoster) {
+          return (
+            <Picture
+              src={localPoster}
+              formats={['avif', 'webp']}
+              alt={`${project.client} — ${project.title}`}
+              widths={[800, 1400, 2000]}
+              sizes="100vw"
+              loading="eager"
+              decoding="async"
+              class="project-hero-poster"
+            />
+          );
+        }
+        return posterUrl ? (
+          <img
+            class="project-hero-poster"
+            src={posterUrl}
+            alt={`${project.client} — ${project.title}`}
+            decoding="async"
+          />
+        ) : null;
+      })()}
+      <div class="project-hero-gradient"></div>
+
+      {project.videoId && (
+        <button class="project-hero-play" id="projectHeroPlay" type="button" aria-label="Reproducir" data-cursor="play">
+          <span class="project-hero-play-circle">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </span>
+          <span class="project-hero-play-label">
+            <span data-lang-es>Reproducir</span>
+            <span data-lang-en>Play</span>
+          </span>
+        </button>
+      )}
+
+      <div class="project-hero-titleblock">
+        <div class="project-hero-meta">
+          <span class="project-hero-meta-item">{project.category}</span>
+          <span class="project-hero-meta-dot">•</span>
+          <span class="project-hero-meta-item">{project.client}</span>
+          <span class="project-hero-meta-dot">•</span>
+          <span class="project-hero-meta-item">{project.year}</span>
+          {project.director && (
+            <>
+              <span class="project-hero-meta-dot">•</span>
+              <span class="project-hero-meta-item project-hero-meta-director">Dir. {project.director}</span>
+            </>
+          )}
+        </div>
+        <h1 class="project-hero-title">{project.title}</h1>
       </div>
-      <h1 class="project-title">{project.title}</h1>
-      <p class="project-client">{project.client}</p>
     </div>
   </section>
 
-  <!-- Video / Media -->
-  <section class="project-media">
-    {project.videoId && (
-      <div class="project-video-container">
-        <div class="project-video-wrapper">
-          <iframe
-            src={`https://www.youtube.com/embed/${project.videoId}?rel=0&modestbranding=1&color=white`}
-            title={`${project.client} — ${project.title}`}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
+  <!-- Synopsis (when present) -->
+  {project.synopsis && (
+    <section class="project-synopsis">
+      <div class="project-synopsis-inner">
+        <div class="project-section-label reveal-up">
+          <span data-lang-es>Sinopsis</span>
+          <span data-lang-en>Synopsis</span>
+        </div>
+        <div class="project-synopsis-body reveal-up">
+          <p data-lang-es>{project.synopsis.es}</p>
+          <p data-lang-en>{project.synopsis.en}</p>
         </div>
       </div>
-    )}
-  </section>
+    </section>
+  )}
 
-  <!-- Project Details -->
-  <section class="project-details">
-    <div class="project-details-grid">
-      <div class="project-detail-block">
-        <div class="project-detail-label">
-          <span data-lang-es>Cliente</span>
-          <span data-lang-en>Client</span>
+  <!-- Case Study (when present) -->
+  {project.caseStudy && (
+    <section class="project-case-study">
+      <div class="project-case-study-inner">
+        <div class="project-section-label reveal-up">
+          <span data-lang-es>Case Study</span>
+          <span data-lang-en>Case Study</span>
         </div>
-        <div class="project-detail-value">{project.client}</div>
-      </div>
-      <div class="project-detail-block">
-        <div class="project-detail-label">
-          <span data-lang-es>Categoría</span>
-          <span data-lang-en>Category</span>
-        </div>
-        <div class="project-detail-value">{project.category}</div>
-      </div>
-      <div class="project-detail-block">
-        <div class="project-detail-label">
-          <span data-lang-es>Año</span>
-          <span data-lang-en>Year</span>
-        </div>
-        <div class="project-detail-value">{project.year}</div>
-      </div>
-      <div class="project-detail-block">
-        <div class="project-detail-label">
-          <span data-lang-es>Producción</span>
-          <span data-lang-en>Production</span>
-        </div>
-        <div class="project-detail-value">Velvet Creative Company</div>
-      </div>
-    </div>
-  </section>
 
-  <!-- Next / Prev Project Navigation -->
-  <section class="project-nav-section">
-    <a href={`/project/${prevProject.slug}`} class="project-nav-link project-nav-prev">
-      <span class="project-nav-label">
-        <span data-lang-es>Anterior</span>
-        <span data-lang-en>Previous</span>
-      </span>
-      <span class="project-nav-title">{prevProject.title}</span>
-      <span class="project-nav-client">{prevProject.client}</span>
-    </a>
-    <a href={`/project/${nextProject.slug}`} class="project-nav-link project-nav-next">
-      <span class="project-nav-label">
-        <span data-lang-es>Siguiente</span>
-        <span data-lang-en>Next</span>
-      </span>
-      <span class="project-nav-title">{nextProject.title}</span>
-      <span class="project-nav-client">{nextProject.client}</span>
+        <div class="project-case-study-grid">
+          <article class="project-case-block reveal-up">
+            <div class="project-case-block-num">01</div>
+            <div class="project-case-block-content">
+              <h3 class="project-case-block-title">
+                <span data-lang-es>Brief</span>
+                <span data-lang-en>Brief</span>
+              </h3>
+              <p data-lang-es>{project.caseStudy.brief.es}</p>
+              <p data-lang-en>{project.caseStudy.brief.en}</p>
+            </div>
+          </article>
+
+          <article class="project-case-block reveal-up">
+            <div class="project-case-block-num">02</div>
+            <div class="project-case-block-content">
+              <h3 class="project-case-block-title">
+                <span data-lang-es>Approach</span>
+                <span data-lang-en>Approach</span>
+              </h3>
+              <p data-lang-es>{project.caseStudy.approach.es}</p>
+              <p data-lang-en>{project.caseStudy.approach.en}</p>
+            </div>
+          </article>
+
+          {project.caseStudy.outcome && (
+            <article class="project-case-block reveal-up">
+              <div class="project-case-block-num">03</div>
+              <div class="project-case-block-content">
+                <h3 class="project-case-block-title">
+                  <span data-lang-es>Outcome</span>
+                  <span data-lang-en>Outcome</span>
+                </h3>
+                <p data-lang-es>{project.caseStudy.outcome.es}</p>
+                <p data-lang-en>{project.caseStudy.outcome.en}</p>
+              </div>
+            </article>
+          )}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Credits (when present, otherwise minimal meta block) -->
+  {project.credits && project.credits.length > 0 ? (
+    <section class="project-credits">
+      <div class="project-credits-inner">
+        <div class="project-section-label reveal-up">
+          <span data-lang-es>Créditos</span>
+          <span data-lang-en>Credits</span>
+        </div>
+        <ul class="project-credits-list">
+          {project.credits.map((credit) => (
+            <li class="project-credit reveal-up">
+              <span class="project-credit-role">{credit.role}</span>
+              <span class="project-credit-line"></span>
+              <span class="project-credit-name">{credit.name}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ) : (
+    <section class="project-credits">
+      <div class="project-credits-inner">
+        <div class="project-section-label reveal-up">
+          <span data-lang-es>Información</span>
+          <span data-lang-en>Information</span>
+        </div>
+        <ul class="project-credits-list">
+          <li class="project-credit reveal-up">
+            <span class="project-credit-role">Client</span>
+            <span class="project-credit-line"></span>
+            <span class="project-credit-name">{project.client}</span>
+          </li>
+          <li class="project-credit reveal-up">
+            <span class="project-credit-role">Category</span>
+            <span class="project-credit-line"></span>
+            <span class="project-credit-name">{project.category}</span>
+          </li>
+          <li class="project-credit reveal-up">
+            <span class="project-credit-role">Year</span>
+            <span class="project-credit-line"></span>
+            <span class="project-credit-name">{project.year}</span>
+          </li>
+          <li class="project-credit reveal-up">
+            <span class="project-credit-role">Production Co.</span>
+            <span class="project-credit-line"></span>
+            <span class="project-credit-name">Velvet Creative Company</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- Stills (when present) -->
+  {project.stills && project.stills.length > 0 && (
+    <section class="project-stills">
+      <div class="project-section-label reveal-up">
+        <span data-lang-es>Stills</span>
+        <span data-lang-en>Stills</span>
+      </div>
+      <div class="project-stills-grid">
+        {project.stills.map((still, i) => (
+          <div class="project-still reveal-up">
+            <img src={still} alt={`${project.title} — still ${i + 1}`} loading="lazy" />
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Next Project (large cinematic card) -->
+  <section class="project-next-section">
+    <a href={`/project/${nextProject.slug}`} class="project-next-card" data-cursor="next">
+      {(() => {
+        const localNext = getProjectPoster(nextProject.slug);
+        if (localNext) {
+          return (
+            <Picture
+              src={localNext}
+              formats={['avif', 'webp']}
+              alt={`${nextProject.client} — ${nextProject.title}`}
+              widths={[800, 1400, 2000]}
+              sizes="100vw"
+              loading="lazy"
+              decoding="async"
+              class="project-next-poster"
+            />
+          );
+        }
+        return nextPoster ? (
+          <img
+            class="project-next-poster"
+            src={nextPoster}
+            alt={`${nextProject.client} — ${nextProject.title}`}
+            loading="lazy"
+            decoding="async"
+          />
+        ) : null;
+      })()}
+      <div class="project-next-overlay"></div>
+      <div class="project-next-content">
+        <span class="project-next-label">
+          <span data-lang-es>Siguiente Proyecto</span>
+          <span data-lang-en>Next Project</span>
+        </span>
+        <h2 class="project-next-title">{nextProject.title}</h2>
+        <span class="project-next-client">
+          {nextProject.client} — {nextProject.year}
+        </span>
+      </div>
     </a>
   </section>
 
@@ -126,4 +337,25 @@ const prevProject = projects[(projectIndex - 1 + projects.length) % projects.len
       <span>Buenos Aires, Argentina</span>
     </div>
   </footer>
+
+  <script>
+    // Click-to-play: replaces poster with iframe, hiding all YouTube chrome on initial state
+    const playBtn = document.getElementById('projectHeroPlay');
+    const media = document.getElementById('projectHeroMedia');
+
+    playBtn?.addEventListener('click', () => {
+      const videoId = media?.dataset.videoId;
+      if (!videoId || !media) return;
+
+      const iframe = document.createElement('iframe');
+      iframe.className = 'project-hero-iframe';
+      iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&color=white&playsinline=1`;
+      iframe.title = 'Player';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.setAttribute('allowfullscreen', '');
+
+      media.classList.add('is-playing');
+      media.appendChild(iframe);
+    });
+  </script>
 </Layout>

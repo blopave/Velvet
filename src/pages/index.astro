@@ -1,48 +1,86 @@
 ---
+import { Picture } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
-import { projects, clients, getProjectImage } from '../data/projects';
+import { projects, getProjectImage, getFeaturedProjects, getProjectBySlug } from '../data/projects';
+import { getProjectPoster } from '../utils/projectImages';
+
+// Piezas curadas para el Vertical Stack — controladas por `featured: true` en projects.ts
+const featuredWork = getFeaturedProjects();
+// Todo lo no-featured va al Archive Grid debajo
+const archiveWork = projects.filter(p => !p.featured);
+
+// Still cinematográfico de fondo del Ethos — cambiar slug para usar otro proyecto
+const ETHOS_STILL_SLUG = 'netflix-di-maria-romper-la-pared';
+const ethosStill = getProjectBySlug(ETHOS_STILL_SLUG) ?? featuredWork[0] ?? projects[0];
 
 const services = [
-  { number: '01', name: { es: 'Film', en: 'Film' } },
-  { number: '02', name: { es: 'Fotografía', en: 'Photography' } },
-  { number: '03', name: { es: 'Contenido Digital', en: 'Digital Content' } },
-  { number: '04', name: { es: 'Activaciones', en: 'Activations' } },
-  { number: '05', name: { es: 'Dirección Creativa', en: 'Creative Direction' } },
-  { number: '06', name: { es: 'Post Producción', en: 'Post Production' } },
+  {
+    number: '01',
+    name: { es: 'Film', en: 'Film' },
+    description: {
+      es: 'Comerciales, branded films y documentales para las marcas más exigentes.',
+      en: 'Commercials, branded films, and documentaries for the world\'s most demanding brands.',
+    },
+    clients: ['Netflix', 'HBO Max', 'Puma'],
+    previewSlug: 'netflix-di-maria-romper-la-pared',
+  },
+  {
+    number: '02',
+    name: { es: 'Fotografía', en: 'Photography' },
+    description: {
+      es: 'Fotografía publicitaria y editorial — desde campaña hasta backstage.',
+      en: 'Advertising and editorial photography — from campaign to backstage.',
+    },
+    clients: ['Visa', 'Under Armour', 'Vista'],
+    previewSlug: 'visa-open-2024',
+  },
+  {
+    number: '03',
+    name: { es: 'Contenido Digital', en: 'Digital Content' },
+    description: {
+      es: 'Piezas cortas, social-first, optimizadas para todas las plataformas.',
+      en: 'Short-form, social-first pieces optimized for every platform.',
+    },
+    clients: ['Puma', 'Star+', 'EA Sports'],
+    previewSlug: 'puma-ultra-future-2024',
+  },
+  {
+    number: '04',
+    name: { es: 'Activaciones', en: 'Activations' },
+    description: {
+      es: 'Eventos, lanzamientos y experiencias en vivo con cobertura A/V integral.',
+      en: 'Events, launches, and live experiences with full A/V coverage.',
+    },
+    clients: ['Puma', 'Corona', 'Betano'],
+    previewSlug: 'puma-future-alto-nono-2024',
+  },
+  {
+    number: '05',
+    name: { es: 'Dirección Creativa', en: 'Creative Direction' },
+    description: {
+      es: 'Concepto, guion y arte visual desde la primera reunión hasta entrega final.',
+      en: 'Concept, scriptwriting, and visual art from first meeting to final delivery.',
+    },
+    clients: ['Netflix', 'Visa', 'Vista'],
+    previewSlug: 'corona-mundial-qatar-2022',
+  },
+  {
+    number: '06',
+    name: { es: 'Post Producción', en: 'Post Production' },
+    description: {
+      es: 'Edición, color, sonido y VFX con estándares globales — todo in-house.',
+      en: 'Editing, color, sound, and VFX with global standards — all in-house.',
+    },
+    clients: ['HBO Max', 'Star+', 'Danone'],
+    previewSlug: 'hbo-max-champions-league-2023',
+  },
 ];
 ---
 
 <Layout>
-  <!-- Navigation -->
+  <!-- Navigation — minimal: logo + lang + menu trigger -->
   <nav class="nav" style="opacity: 0;">
     <a href="/" class="nav-logo">Velvet</a>
-
-    <ul class="nav-center">
-      <li>
-        <a href="#work">
-          <span data-lang-es>Trabajo</span>
-          <span data-lang-en>Work</span>
-        </a>
-      </li>
-      <li>
-        <a href="#services">
-          <span data-lang-es>Servicios</span>
-          <span data-lang-en>Services</span>
-        </a>
-      </li>
-      <li>
-        <a href="#about">
-          <span data-lang-es>Nosotros</span>
-          <span data-lang-en>About</span>
-        </a>
-      </li>
-      <li>
-        <a href="#contact">
-          <span data-lang-es>Contacto</span>
-          <span data-lang-en>Contact</span>
-        </a>
-      </li>
-    </ul>
 
     <div class="nav-right">
       <div class="lang-switch">
@@ -50,100 +88,248 @@ const services = [
         <span class="divider">/</span>
         <button class="lang-btn" data-lang="en">EN</button>
       </div>
-      <button class="nav-menu-btn" aria-label="Menu">
-        <span></span>
-        <span></span>
+      <button class="nav-menu-trigger" id="navMenuTrigger" aria-label="Abrir menú" aria-expanded="false">
+        <span class="nav-menu-trigger-label">
+          <span class="nav-menu-trigger-text" data-state="closed">Menu</span>
+          <span class="nav-menu-trigger-text" data-state="open">Close</span>
+        </span>
+        <span class="nav-menu-trigger-lines" aria-hidden="true">
+          <span></span>
+          <span></span>
+        </span>
       </button>
     </div>
   </nav>
 
-  <!-- Mobile Menu -->
-  <div class="mobile-menu">
-    <a href="#work">
-      <span data-lang-es>Trabajo</span>
-      <span data-lang-en>Work</span>
-    </a>
-    <a href="#services">
-      <span data-lang-es>Servicios</span>
-      <span data-lang-en>Services</span>
-    </a>
-    <a href="#about">
-      <span data-lang-es>Nosotros</span>
-      <span data-lang-en>About</span>
-    </a>
-    <a href="#contact">
-      <span data-lang-es>Contacto</span>
-      <span data-lang-en>Contact</span>
-    </a>
-  </div>
+  <!-- Hero — Through the Letters -->
+  <section class="hero hero-cutout" id="heroCutout">
+    <video
+      class="hero-cutout-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+      poster="/images/reel-poster.jpg"
+    >
+      <source src="/videos/reel.mp4" type="video/mp4" />
+    </video>
+    <div class="hero-cutout-fallback" aria-hidden="true"></div>
+    <canvas class="hero-cutout-canvas" id="heroCutoutCanvas" aria-hidden="true"></canvas>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-video-container">
-      <div class="hero-video-overlay"></div>
-    </div>
+    <svg
+      class="hero-cutout-mask"
+      viewBox="0 0 1600 900"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    >
+      <defs>
+        <mask id="velvetCutoutMask">
+          <rect width="1600" height="900" fill="white" />
+          <text
+            id="velvetCutoutText"
+            x="800"
+            y="475"
+            text-anchor="middle"
+            dominant-baseline="central"
+            font-family="Fraunces, serif"
+            font-weight="800"
+            font-size="320"
+            letter-spacing="-12"
+            fill="black"
+          >VELVET</text>
+        </mask>
+      </defs>
+      <rect
+        id="velvetCutoutOverlay"
+        width="1600"
+        height="900"
+        fill="#0a0a0a"
+        mask="url(#velvetCutoutMask)"
+      />
+    </svg>
 
-    <div class="hero-content">
-      <h1 class="hero-title">
-        <span class="line"><span class="line-inner">Velvet</span></span>
-        <span class="line"><span class="line-inner hero-title-sub">Creative Company</span></span>
-      </h1>
-      <p class="hero-subtitle">
-        <span data-lang-es>Film &mdash; Foto &mdash; Contenido Digital &mdash; Activaciones</span>
-        <span data-lang-en>Film &mdash; Photo &mdash; Digital Content &mdash; Activations</span>
-      </p>
-    </div>
+    <div class="hero-cutout-vignette" aria-hidden="true"></div>
 
-    <div class="hero-scroll-indicator">
-      <span>Scroll</span>
-      <div class="hero-scroll-line"></div>
+    <h1 class="hero-cutout-wordmark" aria-label="Velvet — Creative Company">VELVET</h1>
+
+    <div class="hero-cutout-footer">
+      <button class="hero-reel-btn" type="button" aria-label="Reproducir reel" data-cursor="play">
+        <span class="hero-reel-btn-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </span>
+        <span class="hero-reel-btn-text">
+          <span data-lang-es>Ver Reel</span>
+          <span data-lang-en>Watch Reel</span>
+        </span>
+        <span class="hero-reel-btn-meta">2025</span>
+      </button>
+
+      <div class="hero-cutout-baseline">
+        <span class="hero-cutout-baseline-descriptor">Creative Company</span>
+        <span class="hero-cutout-baseline-sep">&middot;</span>
+        <span>Buenos Aires</span>
+        <span class="hero-cutout-baseline-sep">&middot;</span>
+        <span>Est. 2018</span>
+      </div>
+
+      <div class="hero-scroll-indicator hero-scroll-indicator-bottom">
+        <span>Scroll</span>
+        <div class="hero-scroll-line"></div>
+      </div>
     </div>
   </section>
 
-  <!-- Marquee -->
-  <div class="marquee">
-    <div class="marquee-track">
-      <span>Netflix</span>
-      <span class="filled">&bull;</span>
-      <span class="stroke-accent">Puma</span>
-      <span class="filled">&bull;</span>
-      <span>HBO Max</span>
-      <span class="filled">&bull;</span>
-      <span class="stroke-accent">Visa</span>
-      <span class="filled">&bull;</span>
-      <span>Under Armour</span>
-      <span class="filled">&bull;</span>
-      <span class="stroke-accent">Corona</span>
-      <span class="filled">&bull;</span>
-      <span>EA Sports</span>
-      <span class="filled">&bull;</span>
-      <span class="stroke-accent">Betano</span>
-      <span class="filled">&bull;</span>
-      <span>Netflix</span>
-      <span class="filled">&bull;</span>
-      <span class="stroke-accent">Puma</span>
-      <span class="filled">&bull;</span>
-      <span>HBO Max</span>
-      <span class="filled">&bull;</span>
-      <span class="stroke-accent">Visa</span>
-      <span class="filled">&bull;</span>
-      <span>Under Armour</span>
-      <span class="filled">&bull;</span>
-      <span class="stroke-accent">Corona</span>
-      <span class="filled">&bull;</span>
-      <span>EA Sports</span>
-      <span class="filled">&bull;</span>
-      <span class="stroke-accent">Betano</span>
-      <span class="filled">&bull;</span>
+  <!-- Manifesto -->
+  <section id="about" class="section manifesto-section">
+    <div class="section-label section-label-masked">
+      <span class="section-label-inner">
+        <span data-lang-es>Manifiesto</span>
+        <span data-lang-en>Manifesto</span>
+      </span>
     </div>
+
+    <p class="manifesto-text" data-lang-es>
+      {("No hacemos contenido. Filmamos historias. Cada plano construido, no encontrado. Cada corte ganado. Cada sonido eligido. Filmamos para que se acuerden.").split(' ').map((word) => (
+        <span class="word">{word}&nbsp;</span>
+      ))}
+    </p>
+    <p class="manifesto-text" data-lang-en>
+      {("We don't make content. We film stories. Every frame built, not found. Every cut earned. Every sound chosen. We film so they remember.").split(' ').map((word) => (
+        <span class="word">{word}&nbsp;</span>
+      ))}
+    </p>
+  </section>
+
+  <!-- Brand roll — editorial line, single beat, no motion -->
+  <div class="brand-roll">
+    <p class="brand-roll-line">
+      <span class="brand-roll-prefix">
+        <span data-lang-es>Filmamos para</span>
+        <span data-lang-en>We shoot for</span>
+      </span>
+      <span class="brand-roll-brands">
+        <span class="brand-roll-item">Netflix</span>
+        <span class="brand-roll-sep" aria-hidden="true">&middot;</span>
+        <span class="brand-roll-item">HBO Max</span>
+        <span class="brand-roll-sep" aria-hidden="true">&middot;</span>
+        <span class="brand-roll-item">Puma</span>
+        <span class="brand-roll-sep" aria-hidden="true">&middot;</span>
+        <span class="brand-roll-item">Visa</span>
+        <span class="brand-roll-sep" aria-hidden="true">&middot;</span>
+        <span class="brand-roll-item">Under Armour</span>
+        <span class="brand-roll-sep" aria-hidden="true">&middot;</span>
+        <span class="brand-roll-item">EA Sports</span>
+        <span class="brand-roll-sep" aria-hidden="true">&middot;</span>
+        <span class="brand-roll-item">Corona</span>
+      </span>
+    </p>
   </div>
 
-  <!-- Selected Work -->
-  <section id="work" class="section">
-    <div class="section-header">
-      <div class="section-label reveal-up">
-        <span data-lang-es>Trabajo Seleccionado</span>
-        <span data-lang-en>Selected Work</span>
+  <!-- Work — Vertical Editorial Stack (featured) -->
+  {featuredWork.length > 0 && (
+    <section id="work" class="work-stack-section">
+      <div class="work-stack-intro reveal-up">
+        <span class="work-stack-intro-label">
+          <span data-lang-es>Trabajo</span>
+          <span data-lang-en>Work</span>
+        </span>
+        <span class="work-stack-intro-count">{String(featuredWork.length).padStart(2, '0')}</span>
+      </div>
+
+      {featuredWork.map((project, i) => (
+        <a
+          href={`/project/${project.slug}`}
+          class="work-stack-item"
+          data-cursor="view"
+          data-stack-index={i}
+        >
+          <div class="work-stack-media">
+            {(() => {
+              const localPoster = getProjectPoster(project.slug);
+              return localPoster ? (
+                <Picture
+                  src={localPoster}
+                  formats={['avif', 'webp']}
+                  alt={`${project.client} — ${project.title}`}
+                  widths={[600, 1200, 1920]}
+                  sizes="100vw"
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  class="work-stack-poster"
+                />
+              ) : (
+                <img
+                  class="work-stack-poster"
+                  src={getProjectImage(project)}
+                  alt={`${project.client} — ${project.title}`}
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+              );
+            })()}
+            {project.previewVideo && (
+              <video
+                class="work-item-preview"
+                src={project.previewVideo}
+                muted
+                loop
+                playsinline
+                preload="none"
+                aria-hidden="true"
+              ></video>
+            )}
+          </div>
+
+          <div class="work-stack-overlay"></div>
+
+          <div class="work-stack-counter">
+            <span class="work-stack-counter-current">{String(i + 1).padStart(2, '0')}</span>
+            <span class="work-stack-counter-sep">/</span>
+            <span class="work-stack-counter-total">{String(featuredWork.length).padStart(2, '0')}</span>
+          </div>
+
+          <div class="work-stack-content">
+            <div class="work-stack-meta">
+              <span>{project.client}</span>
+              <span class="work-stack-dot">&bull;</span>
+              <span>{project.category}</span>
+              <span class="work-stack-dot">&bull;</span>
+              <span>{project.year}</span>
+              {project.director && (
+                <>
+                  <span class="work-stack-dot">&bull;</span>
+                  <span class="work-stack-meta-director">Dir. {project.director}</span>
+                </>
+              )}
+            </div>
+            <h3 class="work-stack-title">{project.title}</h3>
+            <span class="work-stack-cta">
+              <span data-lang-es>Ver pieza</span>
+              <span data-lang-en>View piece</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
+          </div>
+        </a>
+      ))}
+    </section>
+  )}
+
+  <!-- Archive Grid (todo el resto) -->
+  {archiveWork.length > 0 && (
+    <section id="archive" class="work-archive-section">
+      <div class="work-archive-divider reveal-up">
+        <span class="work-archive-divider-label">
+          <span data-lang-es>Archivo Completo</span>
+          <span data-lang-en>Full Archive</span>
+        </span>
+        <span class="work-archive-divider-count">
+          {String(archiveWork.length).padStart(2, '0')}
+          <span data-lang-es> piezas</span>
+          <span data-lang-en> pieces</span>
+        </span>
       </div>
 
       <div class="work-filters reveal-up">
@@ -161,239 +347,275 @@ const services = [
           <span data-lang-en>Activations</span>
         </button>
       </div>
-    </div>
 
-    <div class="work-grid">
-      {projects.map((project) => (
-        <a href={`/project/${project.slug}`} class="work-item" data-category={project.category}>
-          <div class="work-item-media">
-            <img
-              src={getProjectImage(project)}
-              alt={`${project.client} — ${project.title}`}
-              loading="lazy"
-            />
-            <div class="work-item-overlay">
-              <div class="work-item-overlay-info">
-                <div class="work-item-overlay-category">{project.category} — {project.client}</div>
-                <h3 class="work-item-overlay-title">{project.title}</h3>
+      <div class="work-archive-grid">
+        {archiveWork.map((project) => (
+          <a
+            href={`/project/${project.slug}`}
+            class="work-item"
+            data-category={project.category}
+            data-cursor="view"
+          >
+            <div class="work-item-media">
+              {(() => {
+                const localPoster = getProjectPoster(project.slug);
+                return localPoster ? (
+                  <Picture
+                    src={localPoster}
+                    formats={['avif', 'webp']}
+                    alt={`${project.client} — ${project.title}`}
+                    widths={[400, 600, 900]}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    loading="lazy"
+                    decoding="async"
+                    class="work-item-poster"
+                  />
+                ) : (
+                  <img
+                    class="work-item-poster"
+                    src={getProjectImage(project)}
+                    alt={`${project.client} — ${project.title}`}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                );
+              })()}
+              {project.previewVideo && (
+                <video
+                  class="work-item-preview"
+                  src={project.previewVideo}
+                  muted
+                  loop
+                  playsinline
+                  preload="none"
+                  aria-hidden="true"
+                ></video>
+              )}
+            </div>
+            <div class="work-item-info">
+              <span class="work-item-title">{project.client} — {project.title}</span>
+              <div class="work-item-meta">
+                <span class="work-item-category">{project.category}</span>
+                <span class="work-item-year">{project.year}</span>
               </div>
             </div>
-          </div>
-          <div class="work-item-info">
-            <span class="work-item-title">{project.client} — {project.title}</span>
-            <div class="work-item-meta">
-              <span class="work-item-category">{project.category}</span>
-              <span class="work-item-year">{project.year}</span>
-            </div>
-          </div>
-        </a>
-      ))}
-    </div>
-  </section>
-
-  <!-- Impact Counter -->
-  <section class="counter-section">
-    <div class="counter-grid">
-      <div class="counter-item">
-        <span class="counter-number" data-count="23">0</span>
-        <span class="counter-label">
-          <span data-lang-es>Producciones</span>
-          <span data-lang-en>Productions</span>
-        </span>
+          </a>
+        ))}
       </div>
-      <div class="counter-item">
-        <span class="counter-number" data-count="12">0</span>
-        <span class="counter-label">
-          <span data-lang-es>Marcas Globales</span>
-          <span data-lang-en>Global Brands</span>
-        </span>
-      </div>
-      <div class="counter-item">
-        <span class="counter-number" data-count="4">0</span>
-        <span class="counter-label">
-          <span data-lang-es>Disciplinas</span>
-          <span data-lang-en>Disciplines</span>
-        </span>
-      </div>
-    </div>
-  </section>
+    </section>
+  )}
 
-  <!-- Manifesto -->
-  <section id="about" class="section">
-    <div class="section-label reveal-up">
-      <span data-lang-es>Manifiesto</span>
-      <span data-lang-en>Manifesto</span>
-    </div>
-
-    <p class="manifesto-text" data-lang-es>
-      {("No solo creamos contenido. Creamos historias que viven en el corazón y la mente de millones. Cada cuadro, cada pixel, cada momento está diseñado para mover al mundo hacia adelante.").split(' ').map((word) => (
-        <span class="word">{word}&nbsp;</span>
-      ))}
-    </p>
-    <p class="manifesto-text" data-lang-en>
-      {("We don't just create content. We craft stories that live in the hearts and minds of millions. Every frame, every pixel, every moment is designed to move people forward.").split(' ').map((word) => (
-        <span class="word">{word}&nbsp;</span>
-      ))}
-    </p>
-  </section>
-
-  <!-- Ethos / Philosophy -->
+  <!-- Ethos / Philosophy — Editorial Spread -->
   <section class="ethos-section">
-    <div class="ethos-grid">
-      <div>
+    <div class="ethos-still-bg" aria-hidden="true">
+      {(() => {
+        const localPoster = getProjectPoster(ethosStill.slug);
+        return localPoster ? (
+          <Picture
+            src={localPoster}
+            formats={['avif', 'webp']}
+            alt=""
+            widths={[800, 1600]}
+            sizes="100vw"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <img
+            src={getProjectImage(ethosStill)}
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+        );
+      })()}
+    </div>
+    <div class="ethos-grain" aria-hidden="true"></div>
+
+    <div class="ethos-inner">
+      <div class="ethos-statement">
         <div class="section-label reveal-up">
           <span data-lang-es>Filosofía</span>
           <span data-lang-en>Philosophy</span>
         </div>
+
         <h2 class="ethos-title">
-          <span data-lang-es>
-            Lo ordinario<br />
-            no nos<br />
-            <span class="italic">interesa.</span>
+          <span class="ethos-title-lang" data-lang-es>
+            <span class="ethos-title-line"><span>Lo ordinario</span></span>
+            <span class="ethos-title-line"><span>no nos</span></span>
+            <span class="ethos-title-line ethos-title-italic"><span>interesa.</span></span>
           </span>
-          <span data-lang-en>
-            The ordinary<br />
-            doesn't<br />
-            <span class="italic">interest us.</span>
+          <span class="ethos-title-lang" data-lang-en>
+            <span class="ethos-title-line"><span>The ordinary</span></span>
+            <span class="ethos-title-line"><span>doesn't</span></span>
+            <span class="ethos-title-line ethos-title-italic"><span>interest us.</span></span>
           </span>
         </h2>
+
+        <div class="ethos-attribution">
+          <span class="ethos-attribution-dash">—</span>
+          <span class="ethos-attribution-text">Velvet &middot; Est. 2018</span>
+        </div>
       </div>
+
       <div class="ethos-body">
         <p data-lang-es>
-          En Velvet, cada proyecto es una oportunidad para desafiar lo establecido. Trabajamos con marcas que entienden que la creatividad no es un lujo — es una necesidad estratégica.
+          <span class="ethos-dash">—</span>
+          Filmamos desde Buenos Aires para Netflix, HBO, Puma y Visa. Pieza por pieza, contra el feed.
         </p>
         <p data-lang-en>
-          At Velvet, every project is an opportunity to challenge the status quo. We work with brands that understand creativity is not a luxury — it's a strategic necessity.
+          <span class="ethos-dash">—</span>
+          We film from Buenos Aires for Netflix, HBO, Puma, and Visa. Piece by piece, against the feed.
         </p>
         <p data-lang-es>
-          Desde Buenos Aires para el mundo, combinamos la pasión latinoamericana con estándares globales de producción. El resultado: trabajo que no solo se ve bien, sino que genera impacto real.
+          <span class="ethos-dash">—</span>
+          Trabajamos con marcas que piden cine, no piezas.
         </p>
         <p data-lang-en>
-          From Buenos Aires to the world, we combine Latin American passion with global production standards. The result: work that doesn't just look good, but creates real impact.
+          <span class="ethos-dash">—</span>
+          We work with brands that ask for cinema, not content.
         </p>
       </div>
     </div>
-    <div class="ethos-large-text">Velvet</div>
   </section>
 
-  <!-- Services -->
-  <section id="services" class="section">
-    <div class="section-label reveal-up">
-      <span data-lang-es>Lo Que Hacemos</span>
-      <span data-lang-en>What We Do</span>
+  <!-- Services — Editorial Chapter List w/ Floating Preview -->
+  <section id="services" class="services-section">
+    <div class="services-intro">
+      <div class="section-label reveal-up">
+        <span data-lang-es>Lo Que Hacemos</span>
+        <span data-lang-en>What We Do</span>
+      </div>
     </div>
 
-    <div>
-      {services.map((service) => (
-        <div class="service-item">
-          <span class="service-number">{service.number}</span>
-          <span class="service-name">
-            <span data-lang-es>{service.name.es}</span>
-            <span data-lang-en>{service.name.en}</span>
-          </span>
-          <span class="service-arrow">&rarr;</span>
-        </div>
-      ))}
+    <div class="services-list" id="servicesList">
+      {services.map((service) => {
+        const previewProject = projects.find(p => p.slug === service.previewSlug);
+        const previewImg = previewProject ? getProjectImage(previewProject) : '';
+        return (
+          <div
+            class="service-item"
+            data-preview={previewImg}
+          >
+            <span class="service-number">{service.number}</span>
+            <div class="service-info">
+              <span class="service-name">
+                <span data-lang-es>{service.name.es}</span>
+                <span data-lang-en>{service.name.en}</span>
+              </span>
+              <span class="service-description">
+                <span data-lang-es>{service.description.es}</span>
+                <span data-lang-en>{service.description.en}</span>
+              </span>
+            </div>
+            <span class="service-clients">{service.clients.join(' · ')}</span>
+            <span class="service-arrow" aria-hidden="true">&rarr;</span>
+          </div>
+        );
+      })}
     </div>
-  </section>
 
-  <!-- Clients -->
-  <section class="section">
-    <div class="section-label reveal-up">
-      <span data-lang-es>Confían en Nosotros</span>
-      <span data-lang-en>Trusted By</span>
-    </div>
-
-    <div class="clients-grid">
-      {clients.map((client) => (
-        <div class="client-item">
-          {client.logo ? (
-            <img
-              src={`https://cdn.simpleicons.org/${client.logo}/666666`}
-              alt={client.name}
-              class="client-logo"
-              loading="lazy"
-            />
-          ) : (
-            <span class="client-text">{client.name}</span>
-          )}
-        </div>
-      ))}
+    <div class="services-preview" id="servicesPreview" aria-hidden="true">
+      <img src="" alt="" />
     </div>
   </section>
 
-  <!-- CTA -->
+
+  <!-- CTA — Closing Frame -->
   <section id="contact" class="cta-section">
-    <h2 class="cta-title">
-      <span data-lang-es>
-        Creemos algo <span class="accent">extraordinario</span>
+    <span class="cta-label">
+      <span data-lang-es>Contacto</span>
+      <span data-lang-en>Contact</span>
+    </span>
+
+    <h2 class="cta-statement">
+      <span class="cta-statement-lang" data-lang-es>
+        <span class="cta-statement-line"><span>Lo siguiente</span></span>
+        <span class="cta-statement-line"><span>no debería ser</span></span>
+        <span class="cta-statement-line cta-statement-italic"><span>ordinario.</span></span>
       </span>
-      <span data-lang-en>
-        Let's create something <span class="accent">extraordinary</span>
+      <span class="cta-statement-lang" data-lang-en>
+        <span class="cta-statement-line"><span>The next one</span></span>
+        <span class="cta-statement-line"><span>shouldn&rsquo;t be</span></span>
+        <span class="cta-statement-line cta-statement-italic"><span>ordinary.</span></span>
       </span>
     </h2>
-    <a href="mailto:juan.rojas@velvetcc.com" class="magnetic-btn">
-      <span data-lang-es>Iniciar un Proyecto</span>
-      <span data-lang-en>Start a Project</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M5 12h14M12 5l7 7-7 7"/>
-      </svg>
+
+    <a href="mailto:juan.rojas@velvetcc.com" class="cta-email" data-cursor="send">
+      <span class="cta-email-address">juan.rojas@velvetcc.com</span>
+      <span class="cta-email-arrow" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M7 17L17 7M9 7h8v8"/>
+        </svg>
+      </span>
     </a>
+
+    <div class="cta-signature">
+      <span>Velvet</span>
+      <span class="cta-signature-sep">&middot;</span>
+      <span>Buenos Aires</span>
+      <span class="cta-signature-sep">&middot;</span>
+      <span>2025</span>
+    </div>
   </section>
 
   <!-- Footer -->
   <footer class="footer">
+    <!-- Asymmetric grid — left compact info / right prominent CTA -->
     <div class="footer-grid">
-      <div>
-        <div class="footer-brand">Velvet</div>
-        <p class="footer-tagline">
-          <span data-lang-es>Estudio creativo premium en Buenos Aires. Historias visuales para las marcas más ambiciosas del mundo.</span>
-          <span data-lang-en>Premium creative studio in Buenos Aires. Visual stories for the world's most ambitious brands.</span>
-        </p>
-      </div>
-
-      <div class="footer-col">
-        <div class="footer-col-title">
-          <span data-lang-es>Navegación</span>
-          <span data-lang-en>Navigation</span>
+      <!-- Left: Studio + Social stacked -->
+      <div class="footer-left">
+        <div class="footer-col">
+          <div class="footer-col-title">
+            <span data-lang-es>Estudio</span>
+            <span data-lang-en>Studio</span>
+          </div>
+          <div class="footer-col-body">
+            <span>Buenos Aires, AR</span>
+            <span class="footer-coord">34&deg;36&prime;S &middot; 58&deg;22&prime;W</span>
+            <span>Est. 2018</span>
+          </div>
         </div>
-        <a href="#work">
-          <span data-lang-es>Trabajo</span>
-          <span data-lang-en>Work</span>
-        </a>
-        <a href="#services">
-          <span data-lang-es>Servicios</span>
-          <span data-lang-en>Services</span>
-        </a>
-        <a href="#about">
-          <span data-lang-es>Nosotros</span>
-          <span data-lang-en>About</span>
-        </a>
-        <a href="#contact">
-          <span data-lang-es>Contacto</span>
-          <span data-lang-en>Contact</span>
-        </a>
-      </div>
 
-      <div class="footer-col">
-        <div class="footer-col-title">Social</div>
-        <a href="https://www.instagram.com/velvet.creative" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://www.linkedin.com/company/velvetcc" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://www.youtube.com/@VelvetC.C" target="_blank" rel="noopener">YouTube</a>
-      </div>
-
-      <div class="footer-col">
-        <div class="footer-col-title">
-          <span data-lang-es>Contacto</span>
-          <span data-lang-en>Contact</span>
+        <div class="footer-col">
+          <div class="footer-col-title">
+            <span data-lang-es>Seguinos</span>
+            <span data-lang-en>Follow</span>
+          </div>
+          <div class="footer-col-body">
+            <a href="https://www.instagram.com/velvet.creative" target="_blank" rel="noopener">Instagram</a>
+            <a href="https://www.linkedin.com/company/velvetcc" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="https://www.youtube.com/@VelvetC.C" target="_blank" rel="noopener">YouTube</a>
+          </div>
         </div>
-        <a href="mailto:juan.rojas@velvetcc.com">juan.rojas@velvetcc.com</a>
+      </div>
+
+      <!-- Right: Contact CTA prominent (email is the main footer action) -->
+      <div class="footer-right">
+        <div class="footer-col-title">
+          <span data-lang-es>Para nuevos proyectos</span>
+          <span data-lang-en>For new projects</span>
+        </div>
+        <a href="mailto:juan.rojas@velvetcc.com" class="footer-email-cta" data-cursor="send">
+          <span class="footer-email-address">juan.rojas@velvetcc.com</span>
+          <span class="footer-email-arrow" aria-hidden="true">↗</span>
+        </a>
+        <div class="footer-right-meta">
+          <span data-lang-es>Respondemos en 24h hábiles.</span>
+          <span data-lang-en>We reply within 24 working hours.</span>
+        </div>
       </div>
     </div>
 
+    <!-- Bottom credit strip — single line editorial -->
     <div class="footer-bottom">
-      <span>&copy; 2026 Velvet — Creative Company.</span>
-      <span>Buenos Aires, Argentina</span>
+      <span class="footer-bottom-mark">&copy; 2026</span>
+      <span class="footer-bottom-sep">&middot;</span>
+      <span>Velvet</span>
+      <span class="footer-bottom-sep">&middot;</span>
+      <span>Creative Company</span>
+      <span class="footer-bottom-sep">&middot;</span>
+      <span>Buenos Aires, AR</span>
     </div>
   </footer>
 </Layout>

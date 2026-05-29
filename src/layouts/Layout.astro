@@ -4,12 +4,20 @@ import '../styles/global.css'
 interface Props {
   title?: string;
   description?: string;
+  ogImage?: string;
+  /** Optional structured data injection (e.g., CreativeWork for project pages) */
+  jsonLd?: Record<string, any>;
 }
 
 const {
   title = 'Velvet — Creative Company',
-  description = 'Estudio creativo premium. Film, Foto, Contenido Digital & Activaciones para las marcas más ambiciosas del mundo.'
+  description = 'Estudio creativo premium en Buenos Aires. Film, fotografía, contenido digital y activaciones para Netflix, HBO, Puma, Visa.',
+  ogImage = '/og-image.jpg',
+  jsonLd,
 } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://velvetcc.com').toString();
+const ogImageUrl = new URL(ogImage, Astro.site ?? 'https://velvetcc.com').toString();
 ---
 
 <!doctype html>
@@ -18,19 +26,90 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/og-image.jpg" />
+    <meta name="theme-color" content="#100D08" />
+
     <title>{title}</title>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Velvet" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:image:alt" content="Velvet — Creative Company" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://img.youtube.com" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.simpleicons.org" />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300..700&family=JetBrains+Mono:wght@300;400&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet" />
+
+    <!-- Structured data: Organization (helps Google understand the brand) -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'Velvet',
+      alternateName: 'Velvet — Creative Company',
+      url: 'https://velvetcc.com',
+      logo: 'https://velvetcc.com/favicon.svg',
+      image: 'https://velvetcc.com/og-image.jpg',
+      email: 'juan.rojas@velvetcc.com',
+      foundingDate: '2018',
+      description,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Buenos Aires',
+        addressCountry: 'AR',
+      },
+      sameAs: [
+        'https://www.instagram.com/velvet.creative',
+        'https://www.linkedin.com/company/velvetcc',
+        'https://www.youtube.com/@VelvetC.C',
+      ],
+    })} />
+
+    {/* Optional page-level structured data (e.g., CreativeWork on project pages) */}
+    {jsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )}
+
+    {/*
+      Plausible Analytics — privacy-friendly, no cookies, no GDPR banner needed.
+      To activate: create account at plausible.io, add velvetcc.com as a property.
+      Defer + async = does not block render.
+    */}
+    <script defer is:inline data-domain="velvetcc.com" src="https://plausible.io/js/script.js"></script>
   </head>
   <body>
+    <a href="#main-content" class="skip-to-content">
+      <span data-lang-es>Saltar al contenido</span>
+      <span data-lang-en>Skip to content</span>
+    </a>
+
     <!-- Film Grain Overlay -->
     <div class="grain"></div>
 
     <!-- Custom Cursor -->
-    <div class="cursor" id="cursor"></div>
-    <div class="cursor-follower" id="cursorFollower"></div>
+    <div class="cursor" id="cursor" aria-hidden="true">
+      <span class="cursor-text" id="cursorText"></span>
+    </div>
+    <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
 
     <!-- Preloader -->
     <div class="preloader" id="preloader">
@@ -39,7 +118,90 @@ const {
       <div class="preloader-counter">000</div>
     </div>
 
-    <slot />
+    <main id="main-content">
+      <slot />
+    </main>
+
+    <!-- Site credit — designed & developed by blo pa/ -->
+    <aside class="credit" aria-label="Sitio diseñado y desarrollado por blo pa/">
+      <div class="credit-inner">
+        <div class="credit-left">
+          <span class="credit-lab">
+            <span class="credit-lab-arrow" aria-hidden="true">&#x21B3;</span>
+            <span data-lang-es>Sitio diseñado &amp; desarrollado por</span>
+            <span data-lang-en>Site designed &amp; developed by</span>
+          </span>
+          <span class="credit-meta">Pablo Vela &middot; Creative Developer &middot; Buenos Aires</span>
+        </div>
+
+        <a
+          href="https://blopavela.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="credit-logo-link"
+          aria-label="Visit blopavela.com"
+          data-cursor="view"
+        >
+          <span class="credit-logo">blo pa/</span>
+          <span class="credit-arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Fullscreen menu overlay (shared across pages) -->
+    <div class="menu-overlay" id="menuOverlay" aria-hidden="true">
+      <div class="menu-overlay-grain" aria-hidden="true"></div>
+
+      <div class="menu-overlay-top">
+        <span class="menu-overlay-mark">Velvet</span>
+        <span class="menu-overlay-tag">
+          <span data-lang-es>Menu</span>
+          <span data-lang-en>Menu</span>
+        </span>
+      </div>
+
+      <nav class="menu-overlay-nav">
+        <a href="/#work" class="menu-overlay-link">
+          <span class="menu-overlay-link-num">01</span>
+          <span class="menu-overlay-link-name">
+            <span class="menu-overlay-link-mask"><span>
+              <span data-lang-es>Trabajo</span><span data-lang-en>Work</span>
+            </span></span>
+          </span>
+        </a>
+        <a href="/#about" class="menu-overlay-link">
+          <span class="menu-overlay-link-num">02</span>
+          <span class="menu-overlay-link-name">
+            <span class="menu-overlay-link-mask"><span>
+              <span data-lang-es>Manifiesto</span><span data-lang-en>Manifesto</span>
+            </span></span>
+          </span>
+        </a>
+        <a href="/#services" class="menu-overlay-link">
+          <span class="menu-overlay-link-num">03</span>
+          <span class="menu-overlay-link-name">
+            <span class="menu-overlay-link-mask"><span>
+              <span data-lang-es>Servicios</span><span data-lang-en>Services</span>
+            </span></span>
+          </span>
+        </a>
+        <a href="/#contact" class="menu-overlay-link">
+          <span class="menu-overlay-link-num">04</span>
+          <span class="menu-overlay-link-name">
+            <span class="menu-overlay-link-mask"><span>
+              <span data-lang-es>Contacto</span><span data-lang-en>Contact</span>
+            </span></span>
+          </span>
+        </a>
+      </nav>
+
+      <div class="menu-overlay-footer">
+        <a href="mailto:juan.rojas@velvetcc.com" class="menu-overlay-email" data-cursor="send">
+          juan.rojas@velvetcc.com
+        </a>
+        <div class="menu-overlay-location">Buenos Aires &middot; Est. 2018</div>
+      </div>
+    </div>
 
     <script>
       import { gsap } from 'gsap';
@@ -58,57 +220,72 @@ const {
       gsap.ticker.add((time) => { lenis.raf(time * 1000); });
       gsap.ticker.lagSmoothing(0);
 
-      // ---- Custom Cursor ----
+      // ---- Contextual Cursor ----
       const cursor = document.getElementById('cursor')!;
-      const follower = document.getElementById('cursorFollower')!;
+      const cursorText = document.getElementById('cursorText')!;
+      const cursorRing = document.getElementById('cursorRing')!;
+
+      const CURSOR_LABELS: Record<string, { es: string; en: string }> = {
+        view: { es: 'Ver', en: 'View' },
+        play: { es: 'Play', en: 'Play' },
+        reel: { es: 'Reel', en: 'Reel' },
+        send: { es: 'Enviar', en: 'Send' },
+        explore: { es: 'Ver', en: 'View' },
+        drag: { es: 'Arrastrar', en: 'Drag' },
+        next: { es: 'Siguiente', en: 'Next' },
+      };
+
       let mouseX = 0, mouseY = 0;
-      let followerX = 0, followerY = 0;
+      let ringX = 0, ringY = 0;
+
+      // quickTo creates ONE optimized setter — no new tween per mousemove
+      const cursorXTo = gsap.quickTo(cursor, 'x', { duration: 0.12, ease: 'power2.out' });
+      const cursorYTo = gsap.quickTo(cursor, 'y', { duration: 0.12, ease: 'power2.out' });
 
       document.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
-        gsap.to(cursor, { x: mouseX, y: mouseY, duration: 0.1 });
+        cursorXTo(mouseX);
+        cursorYTo(mouseY);
       });
 
-      function updateFollower() {
-        followerX += (mouseX - followerX) * 0.08;
-        followerY += (mouseY - followerY) * 0.08;
-        gsap.set(follower, { x: followerX, y: followerY });
-        requestAnimationFrame(updateFollower);
+      function updateRing() {
+        ringX += (mouseX - ringX) * 0.14;
+        ringY += (mouseY - ringY) * 0.14;
+        gsap.set(cursorRing, { x: ringX, y: ringY });
+        requestAnimationFrame(updateRing);
       }
-      updateFollower();
+      updateRing();
 
-      const hoverables = document.querySelectorAll('a, button, .work-item, .magnetic-btn, .service-item');
-      hoverables.forEach(el => {
+      // Generic hover (any link/button without data-cursor): subtle ring grow
+      const interactives = document.querySelectorAll<HTMLElement>('a, button, .work-item, .service-item, [data-cursor]');
+      interactives.forEach(el => {
+        const ctx = el.dataset.cursor;
+
         el.addEventListener('mouseenter', () => {
-          cursor.classList.add('is-hovering');
-          follower.classList.add('is-hovering');
+          if (ctx && CURSOR_LABELS[ctx]) {
+            const lang = (document.documentElement.lang || 'es') as 'es' | 'en';
+            cursorText.textContent = CURSOR_LABELS[ctx][lang] || CURSOR_LABELS[ctx].es;
+            cursor.classList.add('is-context');
+            cursorRing.classList.add('is-context');
+          } else {
+            cursorRing.classList.add('is-hover');
+          }
         });
+
         el.addEventListener('mouseleave', () => {
-          cursor.classList.remove('is-hovering');
-          follower.classList.remove('is-hovering');
+          cursor.classList.remove('is-context');
+          cursorRing.classList.remove('is-context', 'is-hover');
+          cursorText.textContent = '';
         });
       });
 
       // Hide cursor on touch
       if ('ontouchstart' in window) {
         cursor.style.display = 'none';
-        follower.style.display = 'none';
+        cursorRing.style.display = 'none';
         document.documentElement.style.cursor = 'auto';
       }
-
-      // ---- Magnetic Buttons ----
-      document.querySelectorAll<HTMLElement>('.magnetic-btn').forEach(btn => {
-        btn.addEventListener('mousemove', (e) => {
-          const rect = btn.getBoundingClientRect();
-          const x = e.clientX - rect.left - rect.width / 2;
-          const y = e.clientY - rect.top - rect.height / 2;
-          gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: 'power2.out' });
-        });
-        btn.addEventListener('mouseleave', () => {
-          gsap.to(btn, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.5)' });
-        });
-      });
 
       // ---- Nav Scroll Behavior ----
       const nav = document.querySelector<HTMLElement>('.nav');
@@ -142,6 +319,10 @@ const {
         const preloaderTl = gsap.timeline({
           onComplete: () => {
             lenis.start();
+            // CRITICAL ORDER: hero pin first → page gets taller (pinSpacing) →
+            // THEN other triggers compute positions correctly.
+            initHeroCutoutAmbient();
+            initHeroCutout();
             initScrollAnimations();
           }
         });
@@ -168,25 +349,13 @@ const {
           })
           .set(preloader, { display: 'none' });
 
-        // Hero Animations
-        const heroTl = gsap.timeline({ delay: 2.8 });
+        // Hero — Through the Letters entry animation
+        // (shader + scroll-pin already initialized in preloader.onComplete)
+        const heroTl = gsap.timeline({ delay: 2.6 });
         heroTl
-          .to('.hero-title .line-inner', {
-            y: 0,
-            duration: 1.2,
-            ease: 'power4.out',
-            stagger: 0.1,
-          })
-          .to('.hero-subtitle', {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: 'power3.out',
-          }, '-=0.6')
-          .to('.nav', {
-            opacity: 1,
-            duration: 0.6,
-          }, '-=0.4');
+          .to('.hero-cutout-baseline', { opacity: 0.7, duration: 0.8, ease: 'power3.out' })
+          .to('.hero-reel-btn', { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.5')
+          .to('.nav', { opacity: 1, duration: 0.6 }, '-=0.5');
       } else {
         // On non-home pages, hide preloader immediately and init animations
         gsap.set(preloader, { display: 'none' });
@@ -195,99 +364,546 @@ const {
 
       // ---- Scroll Triggered Animations ----
       function initScrollAnimations() {
-        gsap.utils.toArray<HTMLElement>('.reveal-up').forEach(el => {
-          gsap.to(el, {
-            scrollTrigger: { trigger: el, start: 'top 85%' },
-            opacity: 1, y: 0, duration: 1, ease: 'power3.out',
-          });
+        // BATCH: reveal-up shares a single ScrollTrigger, not N individual ones
+        ScrollTrigger.batch('.reveal-up', {
+          start: 'top 85%',
+          onEnter: (els) => {
+            gsap.to(els, {
+              opacity: 1, y: 0, duration: 1, ease: 'power3.out', stagger: 0.06,
+              overwrite: 'auto',
+            });
+          },
         });
 
-        gsap.utils.toArray<HTMLElement>('.work-item').forEach((el, i) => {
-          gsap.from(el, {
-            scrollTrigger: { trigger: el, start: 'top 85%' },
-            opacity: 0, y: 80, duration: 1, delay: (i % 2) * 0.15, ease: 'power3.out',
-          });
+        // BATCH: work-items in archive grid
+        ScrollTrigger.batch('.work-item', {
+          start: 'top 85%',
+          onEnter: (els) => {
+            gsap.from(els, {
+              opacity: 0, y: 80, duration: 1, ease: 'power3.out', stagger: 0.15,
+              overwrite: 'auto',
+            });
+          },
         });
 
-        // Manifesto word reveal
-        const manifestoSection = document.querySelector('.manifesto-text');
-        if (manifestoSection) {
-          const updateManifesto = () => {
-            const lang = document.documentElement.lang || 'es';
-            const selector = `.manifesto-text[data-lang-${lang}] .word`;
-            return document.querySelectorAll(selector);
+        // Vertical Editorial Stack — kinetic transitions per featured piece
+        // OPTIMIZED: 2 triggers per item instead of 4 (combined entry+exit timeline + parallax)
+        gsap.utils.toArray<HTMLElement>('.work-stack-item').forEach((item) => {
+          const content = item.querySelector<HTMLElement>('.work-stack-content');
+          const counter = item.querySelector<HTMLElement>('.work-stack-counter');
+          const poster = item.querySelector<HTMLElement>('.work-stack-poster');
+
+          if (!content || !poster) return;
+
+          // Combined entry + exit timeline tied to the full item pass-through
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: item,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 0.5,
+            },
+          });
+          // 0 → 0.4: entry
+          tl.fromTo(content,
+            { y: 70, opacity: 0 },
+            { y: 0, opacity: 1, ease: 'none', duration: 0.4 },
+            0
+          );
+          if (counter) {
+            tl.fromTo(counter,
+              { y: -20, opacity: 0 },
+              { y: 0, opacity: 0.7, ease: 'none', duration: 0.4 },
+              0
+            );
+          }
+          // 0.6 → 1.0: exit
+          tl.to(content,
+            { y: -40, opacity: 0, scale: 0.96, ease: 'none', duration: 0.4 },
+            0.6
+          );
+          // Continuous background parallax — separate trigger because the timing is different
+          tl.fromTo(poster,
+            { yPercent: -6 },
+            { yPercent: 6, ease: 'none', duration: 1 },
+            0
+          );
+        });
+
+        // Section bridges — choreographed reveals timed to hero pin release
+        const manifestoLabel = document.querySelector<HTMLElement>('.manifesto-section .section-label-masked .section-label-inner > span');
+        if (manifestoLabel) {
+          gsap.set(manifestoLabel, { yPercent: 105 });
+          gsap.to(manifestoLabel, {
+            yPercent: 0,
+            duration: 1.1,
+            ease: 'expo.out',
+            scrollTrigger: {
+              trigger: '.hero-cutout',
+              start: 'bottom 70%',  // fires as hero pin is releasing
+              toggleActions: 'play none none reverse',
+            },
+          });
+        }
+
+        // Brand-roll fade-in as it enters viewport
+        const brandRoll = document.querySelector<HTMLElement>('.brand-roll-line');
+        if (brandRoll) {
+          gsap.from(brandRoll, {
+            opacity: 0,
+            y: 20,
+            duration: 0.9,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: '.brand-roll',
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          });
+        }
+
+        // Footer choreography — left blocks stagger + right CTA reveal + bottom fade
+        const footerEl = document.querySelector<HTMLElement>('.footer');
+        const footerLeftBlocks = document.querySelectorAll<HTMLElement>('.footer-left .footer-col');
+        const footerRight = document.querySelector<HTMLElement>('.footer-right');
+        const footerBottom = document.querySelector<HTMLElement>('.footer-bottom');
+        if (footerEl) {
+          const footerTl = gsap.timeline({
+            scrollTrigger: {
+              trigger: footerEl,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse',
+            },
+          });
+          if (footerLeftBlocks.length) {
+            footerTl.from(footerLeftBlocks, {
+              opacity: 0,
+              y: 24,
+              duration: 0.7,
+              ease: 'power3.out',
+              stagger: 0.12,
+            });
+          }
+          if (footerRight) {
+            footerTl.from(footerRight, {
+              opacity: 0,
+              y: 28,
+              duration: 0.9,
+              ease: 'expo.out',
+            }, '-=0.4');
+          }
+          if (footerBottom) {
+            footerTl.from(footerBottom, {
+              opacity: 0,
+              duration: 0.6,
+              ease: 'power2.out',
+            }, '-=0.3');
+          }
+        }
+
+        // Manifesto — word reveal, optimized: cache words ONCE, skip redundant DOM writes
+        const manifestoTrigger = document.querySelector<HTMLElement>('.manifesto-text');
+        if (manifestoTrigger) {
+          const wordsByLang: Record<string, NodeListOf<HTMLElement>> = {
+            es: document.querySelectorAll<HTMLElement>('.manifesto-text[data-lang-es] .word'),
+            en: document.querySelectorAll<HTMLElement>('.manifesto-text[data-lang-en] .word'),
           };
+          let lastCount = -1;
+          let lastLang = document.documentElement.lang || 'es';
+
+          // Re-sync when language switches
+          document.querySelectorAll<HTMLButtonElement>('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const newLang = btn.dataset.lang || 'es';
+              if (newLang !== lastLang) {
+                wordsByLang[lastLang]?.forEach(w => w.classList.remove('is-active'));
+                lastLang = newLang;
+                lastCount = -1; // force re-apply on next scroll
+              }
+            });
+          });
 
           ScrollTrigger.create({
-            trigger: manifestoSection,
+            trigger: manifestoTrigger,
             start: 'top 70%',
             end: 'bottom 30%',
             onUpdate: (self) => {
-              const words = updateManifesto();
-              const progress = self.progress;
-              words.forEach((word, i) => {
-                if (i / words.length < progress) {
-                  word.classList.add('is-active');
-                } else {
-                  word.classList.remove('is-active');
+              const lang = document.documentElement.lang || 'es';
+              const words = wordsByLang[lang];
+              if (!words || !words.length) return;
+              const targetCount = Math.floor(self.progress * words.length);
+              if (targetCount === lastCount && lang === lastLang) return;
+              // Only mutate the words whose state actually changed
+              if (targetCount > lastCount) {
+                for (let i = Math.max(0, lastCount); i < targetCount; i++) {
+                  words[i]?.classList.add('is-active');
                 }
-              });
+              } else {
+                for (let i = lastCount - 1; i >= targetCount; i--) {
+                  words[i]?.classList.remove('is-active');
+                }
+              }
+              lastCount = targetCount;
+              lastLang = lang;
             },
           });
         }
 
-        // Impact counter
-        document.querySelectorAll<HTMLElement>('.counter-number').forEach(el => {
-          const target = parseInt(el.dataset.count || '0');
-          const counter = { val: 0 };
-          gsap.to(counter, {
-            val: target,
-            duration: 2,
-            ease: 'power2.out',
-            scrollTrigger: { trigger: el, start: 'top 85%' },
-            onUpdate: () => {
-              el.textContent = Math.floor(counter.val).toString();
+        // BATCH: service items
+        ScrollTrigger.batch('.service-item', {
+          start: 'top 85%',
+          onEnter: (els) => {
+            gsap.from(els, {
+              opacity: 0, x: -30, duration: 0.8, ease: 'power3.out', stagger: 0.08,
+              overwrite: 'auto',
+            });
+          },
+        });
+
+
+        // CTA — closing frame: label + lines stagger + email + signature
+        const ctaSection = document.querySelector<HTMLElement>('.cta-section');
+        if (ctaSection) {
+          const ctaLabel = ctaSection.querySelector<HTMLElement>('.cta-label');
+          const ctaLines = ctaSection.querySelectorAll<HTMLElement>('.cta-statement-line > span');
+          const ctaEmail = ctaSection.querySelector<HTMLElement>('.cta-email');
+          const ctaSignature = ctaSection.querySelector<HTMLElement>('.cta-signature');
+
+          gsap.set(ctaLines, { yPercent: 105 });
+          if (ctaEmail) gsap.set(ctaEmail, { opacity: 0, y: 30 });
+          if (ctaSignature) gsap.set(ctaSignature, { opacity: 0, y: 20 });
+
+          const ctaTl = gsap.timeline({
+            scrollTrigger: {
+              trigger: ctaSection,
+              start: 'top 70%',
+              toggleActions: 'play none none reverse',
             },
           });
-        });
-
-        // Service items
-        gsap.utils.toArray<HTMLElement>('.service-item').forEach(el => {
-          gsap.from(el, {
-            scrollTrigger: { trigger: el, start: 'top 85%' },
-            opacity: 0, x: -30, duration: 0.8, ease: 'power3.out',
-          });
-        });
-
-        // Client items
-        gsap.utils.toArray<HTMLElement>('.client-item').forEach((el, i) => {
-          gsap.from(el, {
-            scrollTrigger: { trigger: el, start: 'top 90%' },
-            opacity: 0, scale: 0.9, duration: 0.6, delay: i * 0.05, ease: 'power3.out',
-          });
-        });
-
-        // CTA
-        const ctaTitle = document.querySelector('.cta-title');
-        if (ctaTitle) {
-          gsap.from(ctaTitle, {
-            scrollTrigger: { trigger: ctaTitle, start: 'top 80%' },
-            opacity: 0, y: 60, duration: 1, ease: 'power3.out',
-          });
+          if (ctaLabel) ctaTl.to(ctaLabel, { opacity: 1, duration: 0.6, ease: 'power3.out' });
+          ctaTl.to(ctaLines, {
+            yPercent: 0, duration: 1.0, ease: 'expo.out', stagger: 0.1,
+          }, '-=0.3');
+          if (ctaEmail) ctaTl.to(ctaEmail, {
+            opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+          }, '-=0.4');
+          if (ctaSignature) ctaTl.to(ctaSignature, {
+            opacity: 1, y: 0, duration: 0.7, ease: 'power3.out',
+          }, '-=0.5');
         }
 
-        // Ethos
-        gsap.utils.toArray<HTMLElement>('.ethos-title, .ethos-body').forEach(el => {
-          gsap.from(el, {
-            scrollTrigger: { trigger: el, start: 'top 85%' },
-            opacity: 0, y: 40, duration: 1, ease: 'power3.out',
+        // Ethos — editorial spread with kinetic italic statement
+        const ethosSection = document.querySelector<HTMLElement>('.ethos-section');
+        if (ethosSection) {
+          // Mask reveal: lines slide up from below their overflow:hidden wrapper
+          const regularLines = ethosSection.querySelectorAll<HTMLElement>('.ethos-title-line:not(.ethos-title-italic) > span');
+          const italicWord = ethosSection.querySelectorAll<HTMLElement>('.ethos-title-italic > span');
+          const attribution = ethosSection.querySelector<HTMLElement>('.ethos-attribution');
+          const bodyParagraphs = ethosSection.querySelectorAll<HTMLElement>('.ethos-body p');
+
+          // Initial states (so they don't flash before scroll-trigger fires)
+          gsap.set(regularLines, { yPercent: 105 });
+          gsap.set(italicWord, { xPercent: -18, scale: 1.45, opacity: 0 });
+          if (attribution) gsap.set(attribution, { opacity: 0, y: 20 });
+          gsap.set(bodyParagraphs, { opacity: 0, y: 28 });
+
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: ethosSection,
+              start: 'top 65%',
+              toggleActions: 'play none none reverse',
+            },
           });
+
+          tl.to(regularLines, {
+            yPercent: 0,
+            duration: 1.0,
+            ease: 'expo.out',
+            stagger: 0.12,
+          })
+          .to(italicWord, {
+            xPercent: 0,
+            scale: 1,
+            opacity: 1,
+            duration: 1.3,
+            ease: 'expo.out',
+          }, '-=0.35')
+          .to(attribution, {
+            opacity: 1,
+            y: 0,
+            duration: 0.75,
+            ease: 'power3.out',
+          }, '-=0.7')
+          .to(bodyParagraphs, {
+            opacity: 0.85,
+            y: 0,
+            duration: 0.9,
+            ease: 'power3.out',
+            stagger: 0.18,
+          }, '-=0.85');
+        }
+
+      }
+
+      // ---- Hero Cutout: ScrollTrigger pin + mask animation ----
+      function initHeroCutout() {
+        const heroSection = document.querySelector<HTMLElement>('.hero-cutout');
+        const overlay = document.getElementById('velvetCutoutOverlay') as unknown as SVGRectElement | null;
+        const text = document.getElementById('velvetCutoutText') as unknown as SVGTextElement | null;
+        // Cache vignette ref ONCE — querySelector inside onUpdate ran every frame
+        const vignette = heroSection?.querySelector<HTMLElement>('.hero-cutout-vignette') ?? null;
+        if (!heroSection || !overlay || !text) return;
+
+        // Mobile: smaller base + peak so the wordmark fits in portrait viewBox
+        // (SVG viewBox is 16:9 with slice — large text crops sides on narrow screens)
+        const isMobile = window.innerWidth < 768;
+        const baseFontSize = isMobile ? 130 : 320;
+        const peakFontSize = isMobile ? 400 : 880;
+        const fontDelta = peakFontSize - baseFontSize;
+        text.setAttribute('font-size', String(baseFontSize));
+
+        // Track last applied values to skip redundant DOM writes (font-size triggers SVG layout)
+        let lastFontSize = -1;
+        let lastOverlayOpacity = -1;
+        let lastVignetteOpacity = -1;
+
+        ScrollTrigger.create({
+          trigger: heroSection,
+          start: 'top top',
+          end: '+=130%',
+          pin: true,
+          pinSpacing: true,
+          scrub: 0.5,
+          onUpdate: (self) => {
+            const p = self.progress;
+
+            // Phase 1 (0 → 0.65): letters grow
+            const growProgress = p < 0.65 ? p / 0.65 : 1;
+            const eased = Math.pow(growProgress, 0.78);
+            const fontSize = Math.round(baseFontSize + eased * fontDelta);
+            if (fontSize !== lastFontSize) {
+              text.setAttribute('font-size', String(fontSize));
+              lastFontSize = fontSize;
+            }
+
+            // Phase 2 (0.5 → 1.0): overlay fades
+            const fadeProgress = p > 0.5 ? (p - 0.5) * 2 : 0;
+            const overlayOpacity = Math.round((1 - fadeProgress) * 100) / 100;
+            if (overlayOpacity !== lastOverlayOpacity) {
+              overlay.setAttribute('fill-opacity', String(overlayOpacity));
+              lastOverlayOpacity = overlayOpacity;
+            }
+
+            if (vignette) {
+              const vignetteOpacity = Math.round((1 - fadeProgress * 0.5) * 100) / 100;
+              if (vignetteOpacity !== lastVignetteOpacity) {
+                vignette.style.opacity = String(vignetteOpacity);
+                lastVignetteOpacity = vignetteOpacity;
+              }
+            }
+          },
+        });
+      }
+
+      // ---- Hero Cutout Ambient: WebGL shader behind the cutout, blends through letters ----
+      function initHeroCutoutAmbient() {
+        const canvas = document.getElementById('heroCutoutCanvas') as HTMLCanvasElement | null;
+        if (!canvas) return;
+
+        const gl = canvas.getContext('webgl', { antialias: false, premultipliedAlpha: false });
+        if (!gl) { canvas.style.display = 'none'; return; }
+
+        const vertSrc = `
+          attribute vec2 a_position;
+          void main() { gl_Position = vec4(a_position, 0.0, 1.0); }
+        `;
+
+        const fragSrc = `
+          precision mediump float;
+          uniform vec2 u_resolution;
+          uniform vec2 u_mouse;
+          uniform float u_time;
+
+          // Bayer 4x4 ordered dither — produces structured grain like film print
+          float bayer4(vec2 pos) {
+            int x = int(mod(pos.x, 4.0));
+            int y = int(mod(pos.y, 4.0));
+            int idx = x + y * 4;
+            if (idx ==  0) return 0.0625;
+            if (idx ==  1) return 0.5625;
+            if (idx ==  2) return 0.1875;
+            if (idx ==  3) return 0.6875;
+            if (idx ==  4) return 0.8125;
+            if (idx ==  5) return 0.3125;
+            if (idx ==  6) return 0.9375;
+            if (idx ==  7) return 0.4375;
+            if (idx ==  8) return 0.2500;
+            if (idx ==  9) return 0.7500;
+            if (idx == 10) return 0.1250;
+            if (idx == 11) return 0.6250;
+            if (idx == 12) return 1.0000;
+            if (idx == 13) return 0.5000;
+            if (idx == 14) return 0.8750;
+            return 0.3750;
+          }
+
+          float hash(vec2 p) {
+            return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+          }
+
+          void main() {
+            vec2 fc = gl_FragCoord.xy;
+            vec2 uv = fc / u_resolution;
+            vec2 mouseUv = u_mouse / u_resolution;
+
+            // Aspect-corrected distance from cursor
+            vec2 d = uv - mouseUv;
+            d.x *= u_resolution.x / u_resolution.y;
+            float dist = length(d);
+
+            // Cursor glow — neutral warm white (cream/film stock, not literal gold)
+            float glow = smoothstep(0.55, 0.0, dist);
+            vec3 glowColor = vec3(0.95, 0.92, 0.85);
+
+            // Base near-black
+            vec3 base = vec3(0.035, 0.032, 0.030);
+
+            // Mix in cursor light
+            vec3 col = mix(base, glowColor * 0.42, glow * 0.5);
+
+            // Time wobble — atmospheric drift
+            float wobble = sin(u_time * 0.4 + uv.x * 3.0 + uv.y * 2.0) * 0.5 + 0.5;
+            col += vec3(0.005, 0.004, 0.003) * wobble;
+
+            // Bayer dither (the cinematic grain texture)
+            float dither = bayer4(fc / 2.0);
+            col += (dither - 0.5) * 0.05;
+
+            // Animated hash noise — film grain
+            float n = hash(fc + u_time * 60.0);
+            col += (n - 0.5) * 0.02;
+
+            // Soft vignette baked in
+            float edge = smoothstep(1.3, 0.4, length(uv - 0.5));
+            col *= mix(0.6, 1.0, edge);
+
+            gl_FragColor = vec4(col, 1.0);
+          }
+        `;
+
+        function createShader(type: number, source: string) {
+          const sh = gl!.createShader(type)!;
+          gl!.shaderSource(sh, source);
+          gl!.compileShader(sh);
+          if (!gl!.getShaderParameter(sh, gl!.COMPILE_STATUS)) {
+            console.error('Shader compile error:', gl!.getShaderInfoLog(sh));
+            return null;
+          }
+          return sh;
+        }
+
+        const vs = createShader(gl.VERTEX_SHADER, vertSrc);
+        const fs = createShader(gl.FRAGMENT_SHADER, fragSrc);
+        if (!vs || !fs) { canvas.style.display = 'none'; return; }
+
+        const program = gl.createProgram()!;
+        gl.attachShader(program, vs);
+        gl.attachShader(program, fs);
+        gl.linkProgram(program);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          console.error('Program link error:', gl.getProgramInfoLog(program));
+          canvas.style.display = 'none';
+          return;
+        }
+        gl.useProgram(program);
+
+        // Fullscreen quad
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+          -1, -1,  1, -1,  -1, 1,
+          -1, 1,   1, -1,   1, 1
+        ]), gl.STATIC_DRAW);
+
+        const posLoc = gl.getAttribLocation(program, 'a_position');
+        gl.enableVertexAttribArray(posLoc);
+        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+        const uRes = gl.getUniformLocation(program, 'u_resolution');
+        const uMouse = gl.getUniformLocation(program, 'u_mouse');
+        const uTime = gl.getUniformLocation(program, 'u_time');
+
+        let mouseX = 0, mouseY = 0;
+        let targetX = 0, targetY = 0;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        function resize() {
+          const rect = canvas!.getBoundingClientRect();
+          canvas!.width = Math.max(1, Math.floor(rect.width * dpr));
+          canvas!.height = Math.max(1, Math.floor(rect.height * dpr));
+          gl!.viewport(0, 0, canvas!.width, canvas!.height);
+          if (mouseX === 0 && mouseY === 0) {
+            mouseX = targetX = canvas!.width / 2;
+            mouseY = targetY = canvas!.height / 2;
+          }
+        }
+
+        function onMove(e: MouseEvent) {
+          const rect = canvas!.getBoundingClientRect();
+          targetX = (e.clientX - rect.left) * dpr;
+          targetY = (rect.height - (e.clientY - rect.top)) * dpr; // flip Y for GL
+        }
+
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', onMove);
+        resize();
+
+        const start = performance.now();
+        let isPageHidden = document.hidden;
+        let rafId = 0;
+        let stopped = false;
+
+        document.addEventListener('visibilitychange', () => {
+          isPageHidden = document.hidden;
         });
 
-        // Hero parallax
-        gsap.to('.hero-video-container', {
-          scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
-          y: '20%', ease: 'none',
+        function render() {
+          if (stopped) return;
+          // Skip when page is in background tab
+          if (isPageHidden) {
+            rafId = requestAnimationFrame(render);
+            return;
+          }
+          const rect = canvas!.getBoundingClientRect();
+          // When hero scrolled FULLY past (bottom above viewport top), stop entirely
+          // and let ScrollTrigger restart if user scrolls back.
+          if (rect.bottom < -200) {
+            // Don't loop — saves CPU completely
+            return;
+          }
+          // Offscreen but still close — just skip drawing this frame
+          if (rect.top > window.innerHeight) {
+            rafId = requestAnimationFrame(render);
+            return;
+          }
+          const t = (performance.now() - start) / 1000;
+          mouseX += (targetX - mouseX) * 0.08;
+          mouseY += (targetY - mouseY) * 0.08;
+          gl!.uniform2f(uRes, canvas!.width, canvas!.height);
+          gl!.uniform2f(uMouse, mouseX, mouseY);
+          gl!.uniform1f(uTime, t);
+          gl!.drawArrays(gl!.TRIANGLES, 0, 6);
+          rafId = requestAnimationFrame(render);
+        }
+        render();
+
+        // ScrollTrigger callback: re-kick render when hero re-enters viewport from above
+        ScrollTrigger.create({
+          trigger: canvas,
+          start: 'top bottom',
+          end: 'bottom top',
+          onEnter: () => { if (rafId === 0 || stopped) { stopped = false; render(); } },
+          onEnterBack: () => { stopped = false; render(); },
         });
       }
 
@@ -325,31 +941,132 @@ const {
         });
       }
 
-      // ---- Mobile Menu ----
-      const menuBtn = document.querySelector('.nav-menu-btn');
-      const mobileMenu = document.querySelector('.mobile-menu');
-      const menuLinks = document.querySelectorAll('.mobile-menu a');
+      // ---- Services Floating Preview Thumbnail ----
+      (function initServicesPreview() {
+        const list = document.getElementById('servicesList');
+        const preview = document.getElementById('servicesPreview') as HTMLDivElement | null;
+        const previewImg = preview?.querySelector<HTMLImageElement>('img');
+        if (!list || !preview || !previewImg) return;
+
+        const items = list.querySelectorAll<HTMLElement>('.service-item');
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let currentX = mouseX;
+        let currentY = mouseY;
+        let isActive = false;
+
+        items.forEach((item) => {
+          const src = item.dataset.preview;
+          if (!src) return;
+          item.addEventListener('mouseenter', () => {
+            previewImg.src = src;
+            preview.classList.add('is-visible');
+            isActive = true;
+          });
+          item.addEventListener('mouseleave', () => {
+            preview.classList.remove('is-visible');
+            isActive = false;
+          });
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+        });
+
+        function render() {
+          // Smooth lerp toward mouse, slightly offset right of cursor so it doesn't cover the service name
+          const targetX = mouseX + 40;
+          const targetY = mouseY;
+          currentX += (targetX - currentX) * 0.14;
+          currentY += (targetY - currentY) * 0.14;
+          preview!.style.left = `${currentX}px`;
+          preview!.style.top = `${currentY}px`;
+          requestAnimationFrame(render);
+        }
+        render();
+      })();
+
+      // ---- Hover Video Preview (work grid + work stack) ----
+      document.querySelectorAll<HTMLElement>('.work-item, .work-stack-item').forEach(item => {
+        const video = item.querySelector<HTMLVideoElement>('.work-item-preview');
+        if (!video) return;
+
+        let playRequest: Promise<void> | null = null;
+
+        item.addEventListener('mouseenter', () => {
+          item.classList.add('is-playing-preview');
+          video.currentTime = 0;
+          playRequest = video.play().catch(() => {
+            // Autoplay can fail silently (e.g. file missing) — bail cleanly
+            item.classList.remove('is-playing-preview');
+          });
+        });
+
+        item.addEventListener('mouseleave', () => {
+          item.classList.remove('is-playing-preview');
+          if (playRequest) {
+            playRequest.then(() => video.pause()).catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      });
+
+      // ---- Fullscreen Menu Overlay ----
+      const menuTrigger = document.getElementById('navMenuTrigger') as HTMLButtonElement | null;
+      const menuOverlay = document.getElementById('menuOverlay');
+      const menuLinks = document.querySelectorAll<HTMLElement>('.menu-overlay-link');
+      const menuLinkInner = document.querySelectorAll<HTMLElement>('.menu-overlay-link-mask > span');
+      const menuTop = document.querySelector<HTMLElement>('.menu-overlay-top');
+      const menuFooterEls = document.querySelectorAll<HTMLElement>('.menu-overlay-footer > *');
+
       let menuOpen = false;
 
-      menuBtn?.addEventListener('click', () => {
-        menuOpen = !menuOpen;
-        mobileMenu?.classList.toggle('is-open', menuOpen);
-        if (menuOpen) {
-          lenis.stop();
-          gsap.to(menuLinks, { opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power3.out', delay: 0.3 });
-        } else {
-          lenis.start();
-          gsap.set(menuLinks, { opacity: 0, y: 40 });
-        }
+      function openMenu() {
+        if (!menuOverlay) return;
+        menuOpen = true;
+        document.body.classList.add('menu-open');
+        menuOverlay.classList.add('is-open');
+        menuOverlay.setAttribute('aria-hidden', 'false');
+        menuTrigger?.setAttribute('aria-expanded', 'true');
+        lenis.stop();
+
+        // Animate content in
+        gsap.set(menuLinkInner, { yPercent: 105 });
+        if (menuTop) gsap.set(menuTop, { opacity: 0, y: -10 });
+        gsap.set(menuFooterEls, { opacity: 0, y: 10 });
+
+        gsap.to(menuTop, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', delay: 0.5 });
+        gsap.to(menuLinkInner, {
+          yPercent: 0, duration: 1.0, ease: 'expo.out', stagger: 0.08, delay: 0.45,
+        });
+        gsap.to(menuFooterEls, {
+          opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power3.out', delay: 0.85,
+        });
+      }
+
+      function closeMenu() {
+        if (!menuOverlay) return;
+        menuOpen = false;
+        document.body.classList.remove('menu-open');
+        menuOverlay.classList.remove('is-open');
+        menuOverlay.setAttribute('aria-hidden', 'true');
+        menuTrigger?.setAttribute('aria-expanded', 'false');
+        lenis.start();
+      }
+
+      menuTrigger?.addEventListener('click', () => {
+        if (menuOpen) closeMenu(); else openMenu();
       });
 
       menuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-          menuOpen = false;
-          mobileMenu?.classList.remove('is-open');
-          lenis.start();
-          gsap.set(menuLinks, { opacity: 0, y: 40 });
-        });
+        link.addEventListener('click', () => closeMenu());
+      });
+
+      // ESC closes
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && menuOpen) closeMenu();
       });
     </script>
   </body>
